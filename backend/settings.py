@@ -142,6 +142,8 @@ CORS_ALLOWED_ORIGINS = [
 
 from datetime import timedelta
 
+# REST Framework and JWT settings
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -155,3 +157,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+#  Settings for RAWG API
+
+RAWG_API_KEY = os.getenv("RAWG_API_KEY")
+RAWG_BASE_URL = os.getenv("RAWG_BASE_URL", "https://api.rawg.io/api")
