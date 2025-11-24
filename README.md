@@ -96,3 +96,27 @@ python manage.py createsuperuser
 ```bash
 python manage.py startapp users
 ```
+
+---
+
+## Frontend Setup (React + Vite)
+
+### 1. Create React App
+In your project root type:
+```bash
+npm create vite@latest frontend -- --template react
+```
+
+And select the options below:
+```bash
+Select a framework: React
+Select a variant: JavaScript
+Use rolldown-vite (Experimental)?: No
+Install with npm and start now? Yes
+Click http://localhost:5173/ to run app
+```
+
+### 2. Run Development Server
+```bash
+npm run dev
+```
