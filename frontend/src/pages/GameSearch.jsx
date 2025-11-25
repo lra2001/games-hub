@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../api/axios.js";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function GameSearch() {
+  const { user } = useAuth();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,7 +34,6 @@ export default function GameSearch() {
 
   async function addToLibrary(game, status = "wishlist") {
     try {
-      // backend endpoint supports game_id + status
       await api.post("library/add-from-rawg/", {
         game_id: game.id,
         status,
@@ -50,6 +51,7 @@ export default function GameSearch() {
       {loading && <p>Loading…</p>}
       {error && <p className="error">{error}</p>}
       {games.length === 0 && !loading && <p>No results</p>}
+
       <ul>
         {games.map((g) => (
           <li key={g.id}>
@@ -57,11 +59,20 @@ export default function GameSearch() {
               <img src={g.background_image} alt={g.name} width="100" />
             )}
             <strong>{g.name}</strong>
-            <div>
-              <button onClick={() => addToLibrary(g, "wishlist")}>Wishlist</button>
-              <button onClick={() => addToLibrary(g, "favorite")}>Favorite</button>
-              <button onClick={() => addToLibrary(g, "played")}>Played</button>
-            </div>
+
+            {/* AUTH CHECK — show buttons only if user is logged in */}
+            {user ? (
+              <div>
+                <button onClick={() => addToLibrary(g, "wishlist")}>Wishlist</button>
+                <button onClick={() => addToLibrary(g, "favorite")}>Favorite</button>
+                <button onClick={() => addToLibrary(g, "played")}>Played</button>
+              </div>
+            ) : (
+              <p style={{ color: "gray" }}>
+                <a href="/login">Login</a> or{" "}
+                <a href="/register">Register</a> to add games to your Wishlist, Favorites or Played.
+              </p>
+            )}
           </li>
         ))}
       </ul>

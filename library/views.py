@@ -1,8 +1,11 @@
 from rest_framework import generics, permissions, status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import LibraryItem
 from .serializers import LibraryItemSerializer
+from rest_framework.decorators import api_view, permission_classes
+import requests
+from django.conf import settings
+
 
 # Create your views here.
 
@@ -23,35 +26,42 @@ class LibraryItemRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
     def get_queryset(self):
         return LibraryItem.objects.filter(user=self.request.user)
 
-class AddLibraryItemFromRAWG(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def add_from_rawg(request):
+    game_id = request.data.get("game_id")
+    status_value = request.data.get("status", "wishlist")
 
-    def post(self, request):
-        game_id = request.data.get("game_id")
-        status_choice = request.data.get("status")
+    if not game_id:
+        return Response({"error": "game_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not game_id:
-            return Response({"error": "game_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+    # Fetch game details from RAWG
+    url = f"{settings.RAWG_BASE_URL}/games/{game_id}"
+    params = {"key": settings.RAWG_API_KEY}
+    rawg_response = requests.get(url, params=params)
+    game = rawg_response.json()
 
-        if not status_choice:
-            return Response({"error": "status is required"}, status=status.HTTP_400_BAD_REQUEST)
+    # Avoid duplicates
+    exists = LibraryItem.objects.filter(
+        user=request.user,
+        game_id=game_id,
+        status=status_value
+    ).first()
 
-        valid_statuses = [choice[0] for choice in LibraryItem.STATUS_CHOICES]
-        if status_choice not in valid_statuses:
-            return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
+    if exists:
+        return Response({"error": "Already in library with this status"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Prevent duplicates
-        if LibraryItem.objects.filter(
-            user=request.user, game_id=game_id, status=status_choice
-        ).exists():
-            return Response({"error": "Item already exists"}, status=status.HTTP_400_BAD_REQUEST)
+    # Create library item
+    library_item = LibraryItem.objects.create(
+        user=request.user,
+        game_id=game_id,
+        title=game.get("name"),
+        background_image=game.get("background_image"),
+        rating=game.get("rating"),
+        status=status_value,
+    )
 
-        # Create the item
-        new_item = LibraryItem.objects.create(
-            user=request.user,
-            game_id=game_id,
-            status=status_choice
-        )
-
-        serializer = LibraryItemSerializer(new_item)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(
+        {"message": "Game added", "item_id": library_item.id},
+        status=status.HTTP_201_CREATED
+    )
