@@ -21,7 +21,7 @@ class LibraryItem(models.Model):
     rating = models.FloatField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('user', 'game_id', 'status') # user can’t add the same game to the same status twice
+        unique_together = ('user', 'game_id', 'status') # user can't add the same game to the same status twice
         ordering = ['-created_at']
 
     def __str__(self):

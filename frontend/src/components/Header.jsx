@@ -1,56 +1,54 @@
-import { useAuth } from "../auth/AuthContext.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
-export default function Header({ onSearch }) {
+export default function Header() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
+
+  function handleSearch(e) {
+    e.preventDefault();
+    const query = e.target.search.value.trim();
+    if (query) {
+      navigate(`/search?query=${encodeURIComponent(query)}`);
+    }
+  }
 
   return (
-    <header>
-      <Link to="/">GamesHub</Link>
+    <header className="header">
+      {/* Logo */}
+      <div className="logo">
+        <Link to="/">GamesHub</Link>
+      </div>
 
-      {user ? (
-        <>
-          <span>Welcome, {user.first_name || user.username}</span>
-          <button onClick={logout}>Logout</button>
-        </>
-      ) : (
-        <Link to="/login">Login</Link>
-      )}
+      {/* Search bar */}
+      <form onSubmit={handleSearch} className="search-form">
+        <input name="search" type="text" placeholder="Search games..." />
+        <button type="submit">Search</button>
+      </form>
+
+      {/* Right side: login/register OR user + logout */}
+      <div className="auth-links">
+        {user ? (
+          <>
+            <span>Hello, {user.first_name || user.username}</span>
+            <button onClick={handleLogout} style={{ marginLeft: "1rem" }}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/register" style={{ marginLeft: "1rem" }}>
+              Register
+            </Link>
+          </>
+        )}
+      </div>
     </header>
   );
 }
-
-// import { Link } from "react-router-dom";
-// import { useState } from "react";
-
-// export default function Header({ onSearch }) {
-//   const [query, setQuery] = useState("");
-
-//   function handleSubmit(e) {
-//     e.preventDefault();
-//     if (onSearch) onSearch(query);
-//   }
-
-//   return (
-//     <header className="header">
-//       <div className="logo">
-//         <Link to="/">GamesHub</Link>
-//       </div>
-
-//       <form className="search-form" onSubmit={handleSubmit}>
-//         <input
-//           type="text"
-//           placeholder="Search games..."
-//           value={query}
-//           onChange={(e) => setQuery(e.target.value)}
-//         />
-//         <button type="submit">Search</button>
-//       </form>
-
-//       <div className="auth-links">
-//         <Link to="/login">Login</Link>
-//         <Link to="/register">Register</Link>
-//       </div>
-//     </header>
-//   );
-// }

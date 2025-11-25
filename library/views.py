@@ -6,7 +6,7 @@ from .serializers import LibraryItemSerializer
 
 # Create your views here.
 
-class LibraryItemListCreateView(generics.ListCreateAPIView): # list all of the current user’s items + add new items
+class LibraryItemListCreateView(generics.ListCreateAPIView): # list all of the current user's items + add new items
     serializer_class = LibraryItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 

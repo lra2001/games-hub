@@ -35,7 +35,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If unauthorized AND request wasn’t retried yet:
+    // If unauthorized AND request wasn't retried yet:
     if (error.response?.status === 401 && !originalRequest._retry) {
       const refresh = localStorage.getItem("refresh");
       if (!refresh) {
