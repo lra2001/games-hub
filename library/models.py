@@ -16,6 +16,9 @@ class LibraryItem(models.Model):
     game_id = models.IntegerField(help_text='RAWG game ID')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=255, blank=True)
+    background_image = models.URLField(blank=True, null=True)
+    rating = models.FloatField(blank=True, null=True)
 
     class Meta:
         unique_together = ('user', 'game_id', 'status') # user can’t add the same game to the same status twice

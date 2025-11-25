@@ -4,5 +4,5 @@ from .models import LibraryItem
 class LibraryItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = LibraryItem
-        fields = ('id', 'user', 'game_id', 'status', 'created_at')
-        read_only_fields = ('user', 'created_at')
+        fields = ('id','user','game_id','status','title','background_image','rating','created_at')
+        read_only_fields = ('user','created_at')

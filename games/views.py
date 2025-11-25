@@ -10,9 +10,11 @@ class GameSearchView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        query = request.GET.get("query", "")
+        query = request.GET.get("query", "").strip()
+
+        # If there is no input from user, return empty results instead of 400
         if not query:
-            return Response({"error": "Query is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"results": []}, status=status.HTTP_200_OK)
 
         url = f"{settings.RAWG_BASE_URL}/games"
         params = {
@@ -29,7 +31,6 @@ class GameSearchView(APIView):
 
         data = rawg_response.json()
         return Response(data, status=status.HTTP_200_OK)
-
 
 class GameDetailView(APIView):
     permission_classes = [permissions.AllowAny]
