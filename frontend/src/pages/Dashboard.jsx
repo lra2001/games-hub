@@ -9,6 +9,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const counts = items.reduce(
+  (acc, item) => {
+    const key = item.status?.toLowerCase();
+    if (key === "wishlist") acc.wishlist += 1;
+    if (key === "favorite") acc.favorite += 1;
+    if (key === "played") acc.played += 1;
+    return acc;
+  },
+  { wishlist: 0, favorite: 0, played: 0 }
+);
+
   useEffect(() => {
     async function loadLibrary() {
       setLoading(true);
@@ -43,9 +54,15 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <aside className="sidebar">
         <nav>
-          <NavLink to="/dashboard/wishlist">Wishlist</NavLink>
-          <NavLink to="/dashboard/favorites">Favorites</NavLink>
-          <NavLink to="/dashboard/played">Played</NavLink>
+          <NavLink to="/dashboard/wishlist">
+            Wishlist ({counts.wishlist})
+          </NavLink>
+          <NavLink to="/dashboard/favorites">
+            Favorites ({counts.favorite})
+          </NavLink>
+          <NavLink to="/dashboard/played">
+            Played ({counts.played})
+          </NavLink>
         </nav>
       </aside>
 
