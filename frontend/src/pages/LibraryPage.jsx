@@ -9,7 +9,7 @@ export default function LibraryPage({ items, status, onRemove }) {
 
       {filtered.length === 0 && <p>No games added yet.</p>}
 
-      <ul>
+      <ul className="library-list">
         {filtered.map((item) => (
           <li key={item.id}>
             {item.background_image && (

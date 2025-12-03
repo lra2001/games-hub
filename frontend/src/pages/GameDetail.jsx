@@ -100,7 +100,7 @@ export default function GameDetail() {
   }
 
   if (loading) return <p>Loading game…</p>;
-  if (error) return <p className="error">{error}</p>;
+  if (error) return <p className="alert error">{error}</p>;
   if (!game) return null;
 
   const { wishlist, favorite, played } = libraryStatuses;
@@ -133,7 +133,7 @@ export default function GameDetail() {
 
       {/* Inline feedback */}
       {message && (
-        <p className={message.type === "error" ? "error" : "success"}>
+        <p className={`alert ${message.type}`}>
           {message.text}
         </p>
       )}

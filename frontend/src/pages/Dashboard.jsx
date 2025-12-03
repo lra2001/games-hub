@@ -68,7 +68,7 @@ export default function Dashboard() {
 
       <main className="dashboard-main">
         {loading && <p>Loading library…</p>}
-        {error && <p className="error">{error}</p>}
+        {error && <p className="alert error">{error}</p>}
 
         {!loading && !error && (
           <Routes>

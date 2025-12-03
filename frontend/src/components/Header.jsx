@@ -27,7 +27,7 @@ export default function Header() {
 
       {/* Search bar */}
       <form onSubmit={handleSearch} className="search-form">
-        <input name="search" type="text" placeholder="Search games..." />
+        <input name="search" type="text" placeholder="Search 897,466 games..." />
         <button type="submit">Search</button>
       </form>
 

@@ -31,7 +31,8 @@ export default function Register() {
 
   return (
     <div className="auth-container">
-      <h1>Register</h1>
+      <div className="auth-card">
+      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <input name="username" placeholder="Username" onChange={handleChange} required />
         <input name="email" placeholder="Email" type="email" onChange={handleChange} required />
@@ -41,7 +42,8 @@ export default function Register() {
         <input name="last_name" placeholder="Last Name (optional)" onChange={handleChange} />
         <button type="submit">Register</button>
       </form>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="alert error">{error}</p>}
+      </div>
     </div>
   );
 }

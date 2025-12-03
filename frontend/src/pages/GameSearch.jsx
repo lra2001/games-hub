@@ -78,13 +78,13 @@ export default function GameSearch() {
 
       {/* INLINE FEEDBACK */}
       {feedback && (
-        <p className={feedback.type === "error" ? "error" : "success"}>
+        <p className={`alert ${feedback.type}`}>
           {feedback.text}
         </p>
       )}
 
       {loading && <p>Loading…</p>}
-      {error && <p className="error">{error}</p>}
+      {error && <p className="alert error">{error}</p>}
       {games.length === 0 && !loading && <p>No results</p>}
 
       <ul>
