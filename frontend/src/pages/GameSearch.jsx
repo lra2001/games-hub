@@ -8,6 +8,7 @@ export default function GameSearch() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [feedback, setFeedback] = useState(null); // { type, text }
 
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
@@ -19,8 +20,10 @@ export default function GameSearch() {
         return;
       }
       setLoading(true);
+      setError(null);
+      setFeedback(null);
       try {
-        const res = await api.get(`games/search/`, { params: { query } });
+        const res = await api.get("games/search/", { params: { query } });
         setGames(res.data.results || []);
       } catch (err) {
         console.error(err);
@@ -33,21 +36,53 @@ export default function GameSearch() {
   }, [query]);
 
   async function addToLibrary(game, status = "wishlist") {
+    if (!user) {
+      setFeedback({
+        type: "error",
+        text: "Please login or register to add games to your library.",
+      });
+      console.log("feedback set:", {
+        type: "error",
+        text: "Please login or register to add games to your library.",
+      });
+      return;
+    }
+
     try {
       await api.post("library/add-from-rawg/", {
         game_id: game.id,
         status,
       });
-      alert(`${game.name} added to your library`);
+      const msg = {
+        type: "success",
+        text: `${game.name} added to your ${status} list.`,
+      };
+      setFeedback(msg);
+      console.log("feedback set:", msg);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Failed to add to library");
+      const msg = {
+        type: "error",
+        text:
+          err.response?.data?.error ||
+          "Failed to add game to your library.",
+      };
+      setFeedback(msg);
+      console.log("feedback set:", msg);
     }
   }
 
   return (
     <div>
       <h1>Search Results {query && `for "${query}"`}</h1>
+
+      {/* INLINE FEEDBACK */}
+      {feedback && (
+        <p className={feedback.type === "error" ? "error" : "success"}>
+          {feedback.text}
+        </p>
+      )}
+
       {loading && <p>Loading…</p>}
       {error && <p className="error">{error}</p>}
       {games.length === 0 && !loading && <p>No results</p>}
@@ -65,14 +100,21 @@ export default function GameSearch() {
 
             {user ? (
               <div>
-                <button onClick={() => addToLibrary(g, "wishlist")}>Wishlist</button>
-                <button onClick={() => addToLibrary(g, "favorite")}>Favorite</button>
-                <button onClick={() => addToLibrary(g, "played")}>Played</button>
+                <button onClick={() => addToLibrary(g, "wishlist")}>
+                  Wishlist
+                </button>
+                <button onClick={() => addToLibrary(g, "favorite")}>
+                  Favorite
+                </button>
+                <button onClick={() => addToLibrary(g, "played")}>
+                  Played
+                </button>
               </div>
             ) : (
               <p style={{ color: "gray" }}>
                 <a href="/login">Login</a> or{" "}
-                <a href="/register">Register</a> to add games to your Wishlist, Favorites or Played.
+                <a href="/register">Register</a> to add games to your
+                Wishlist, Favorites or Played.
               </p>
             )}
           </li>

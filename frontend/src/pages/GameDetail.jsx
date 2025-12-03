@@ -10,7 +10,14 @@ export default function GameDetail() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [addingStatus, setAddingStatus] = useState(null);
+  const [libraryStatuses, setLibraryStatuses] = useState({
+    wishlist: false,
+    favorite: false,
+    played: false,
+  });
+  const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: string }
 
+  // Load game details from backend (proxying RAWG)
   useEffect(() => {
     async function loadGame() {
       setLoading(true);
@@ -28,22 +35,65 @@ export default function GameDetail() {
     loadGame();
   }, [id]);
 
+  // After game and user are known, check if this game is in user's library
+  useEffect(() => {
+    if (!user || !game) return;
+
+    async function loadLibraryStatus() {
+      try {
+        const res = await api.get("library/");
+        const thisGameItems = res.data.filter(
+          (item) => item.game_id === game.id
+        );
+        const statuses = { wishlist: false, favorite: false, played: false };
+        thisGameItems.forEach((item) => {
+          const key = item.status?.toLowerCase();
+          if (key && statuses.hasOwnProperty(key)) {
+            statuses[key] = true;
+          }
+        });
+        setLibraryStatuses(statuses);
+      } catch (err) {
+        console.error("Failed to load library for this game:", err);
+      }
+    }
+
+    loadLibraryStatus();
+  }, [user, game]);
+
   async function addToLibrary(status = "wishlist") {
     if (!user) {
-      alert("Please login or register to add games to your library.");
+      setMessage({
+        type: "error",
+        text: "Please login or register to add games to your library.",
+      });
       return;
     }
 
     try {
       setAddingStatus(status);
+      setMessage(null);
       await api.post("library/add-from-rawg/", {
         game_id: game.id,
         status,
       });
-      alert(`Added to your ${status} list.`);
+
+      // Mark this status as present so the button can be disabled
+      setLibraryStatuses((prev) => ({
+        ...prev,
+        [status]: true,
+      }));
+
+      setMessage({
+        type: "success",
+        text: `Added to your ${status} list.`,
+      });
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Failed to add to library.");
+      setMessage({
+        type: "error",
+        text: err.response?.data?.error || "Failed to add to library.",
+      });
     } finally {
       setAddingStatus(null);
     }
@@ -52,6 +102,8 @@ export default function GameDetail() {
   if (loading) return <p>Loading game…</p>;
   if (error) return <p className="error">{error}</p>;
   if (!game) return null;
+
+  const { wishlist, favorite, played } = libraryStatuses;
 
   return (
     <div className="game-detail">
@@ -65,8 +117,12 @@ export default function GameDetail() {
         />
       )}
 
-      <p><strong>Rating:</strong> {game.rating ?? "N/A"}</p>
-      <p><strong>Released:</strong> {game.released ?? "Unknown"}</p>
+      <p>
+        <strong>Rating:</strong> {game.rating ?? "N/A"}
+      </p>
+      <p>
+        <strong>Released:</strong> {game.released ?? "Unknown"}
+      </p>
 
       {game.description_raw && (
         <>
@@ -75,26 +131,47 @@ export default function GameDetail() {
         </>
       )}
 
+      {/* Inline feedback */}
+      {message && (
+        <p className={message.type === "error" ? "error" : "success"}>
+          {message.text}
+        </p>
+      )}
+
       <div className="game-detail-actions">
         {user ? (
           <>
             <button
               onClick={() => addToLibrary("wishlist")}
-              disabled={!!addingStatus}
+              disabled={!!addingStatus || wishlist}
             >
-              {addingStatus === "wishlist" ? "Adding…" : "Add to Wishlist"}
+              {wishlist
+                ? "This game is already in your Wishlist"
+                : addingStatus === "wishlist"
+                ? "Adding…"
+                : "Add to Wishlist"}
             </button>
+
             <button
               onClick={() => addToLibrary("favorite")}
-              disabled={!!addingStatus}
+              disabled={!!addingStatus || favorite}
             >
-              {addingStatus === "favorite" ? "Adding…" : "Add to Favorites"}
+              {favorite
+                ? "This game is already in your Favorites"
+                : addingStatus === "favorite"
+                ? "Adding…"
+                : "Add to Favorites"}
             </button>
+
             <button
               onClick={() => addToLibrary("played")}
-              disabled={!!addingStatus}
+              disabled={!!addingStatus || played}
             >
-              {addingStatus === "played" ? "Adding…" : "Mark as Played"}
+              {played
+                ? "This game is already marked as Played"
+                : addingStatus === "played"
+                ? "Adding…"
+                : "Mark as Played"}
             </button>
           </>
         ) : (

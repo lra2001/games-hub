@@ -73,6 +73,18 @@
   padding: 1rem;
 }
 
+.success {
+  color: #2e7d32;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.error {
+  color: #c62828;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-container {
