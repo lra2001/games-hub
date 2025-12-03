@@ -1,4 +1,4 @@
-// frontend/src/pages/LibraryPage.jsx
+import { Link } from "react-router-dom";
 export default function LibraryPage({ items, status, onRemove }) {
   const filtered = items.filter((item) => item.status === status);
   const label = status.charAt(0).toUpperCase() + status.slice(1);
@@ -21,7 +21,11 @@ export default function LibraryPage({ items, status, onRemove }) {
               />
             )}
 
-            <strong>{item.title || `Game #${item.game_id}`}</strong>
+            <strong>
+              <Link to={`/games/${item.game_id}`}>
+                {item.title || `Game #${item.game_id}`}
+              </Link>
+            </strong>
 
             <button
               onClick={() => onRemove(item.id)}

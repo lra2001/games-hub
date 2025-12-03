@@ -6,6 +6,7 @@ import Register from "./auth/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import GameSearch from "./pages/GameSearch.jsx";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
+import GameDetail from "./pages/GameDetail.jsx";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/games/:id" element={<GameDetail />} />
 
         {/* Protected dashboard */}
         <Route

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
@@ -58,9 +58,11 @@ export default function GameSearch() {
             {g.background_image && (
               <img src={g.background_image} alt={g.name} width="100" />
             )}
-            <strong>{g.name}</strong>
 
-            {/* AUTH CHECK — show buttons only if user is logged in */}
+            <strong>
+              <Link to={`/games/${g.id}`}>{g.name}</Link>
+            </strong>
+
             {user ? (
               <div>
                 <button onClick={() => addToLibrary(g, "wishlist")}>Wishlist</button>
