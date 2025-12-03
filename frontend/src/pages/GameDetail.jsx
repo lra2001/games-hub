@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function GameDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const prevQuery = searchParams.get("query");
+  const prevPage = searchParams.get("page");
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,9 +18,10 @@ export default function GameDetail() {
     favorite: false,
     played: false,
   });
-  const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: string }
 
-  // Load game details from backend (proxying RAWG)
+  const [message, setMessage] = useState(null); // { type, text }
+
+  // Load game details from backend
   useEffect(() => {
     async function loadGame() {
       setLoading(true);
@@ -78,7 +82,6 @@ export default function GameDetail() {
         status,
       });
 
-      // Mark this status as present so the button can be disabled
       setLibraryStatuses((prev) => ({
         ...prev,
         [status]: true,
@@ -106,80 +109,103 @@ export default function GameDetail() {
   const { wishlist, favorite, played } = libraryStatuses;
 
   return (
-    <div className="game-detail">
-      <h1>{game.name}</h1>
+    <div className="game-detail-page">
+      <div className="game-detail-card">
+        <div className="game-detail-topbar">
+          <Link
+            to={
+              prevQuery
+                ? `/search?query=${encodeURIComponent(prevQuery)}${
+                    prevPage ? `&page=${prevPage}` : ""
+                  }`
+                : "/search"
+            }
+          >
+            &larr; Back to search
+          </Link>
+        </div>
 
-      {game.background_image && (
-        <img
-          src={game.background_image}
-          alt={game.name}
-          className="game-detail-image"
-        />
-      )}
-
-      <p>
-        <strong>Rating:</strong> {game.rating ?? "N/A"}
-      </p>
-      <p>
-        <strong>Released:</strong> {game.released ?? "Unknown"}
-      </p>
-
-      {game.description_raw && (
-        <>
-          <h3>Description</h3>
-          <p>{game.description_raw}</p>
-        </>
-      )}
-
-      {/* Inline feedback */}
-      {message && (
-        <p className={`alert ${message.type}`}>
-          {message.text}
-        </p>
-      )}
-
-      <div className="game-detail-actions">
-        {user ? (
-          <>
-            <button
-              onClick={() => addToLibrary("wishlist")}
-              disabled={!!addingStatus || wishlist}
-            >
-              {wishlist
-                ? "This game is already in your Wishlist"
-                : addingStatus === "wishlist"
-                ? "Adding…"
-                : "Add to Wishlist"}
-            </button>
-
-            <button
-              onClick={() => addToLibrary("favorite")}
-              disabled={!!addingStatus || favorite}
-            >
-              {favorite
-                ? "This game is already in your Favorites"
-                : addingStatus === "favorite"
-                ? "Adding…"
-                : "Add to Favorites"}
-            </button>
-
-            <button
-              onClick={() => addToLibrary("played")}
-              disabled={!!addingStatus || played}
-            >
-              {played
-                ? "This game is already marked as Played"
-                : addingStatus === "played"
-                ? "Adding…"
-                : "Mark as Played"}
-            </button>
-          </>
-        ) : (
-          <p style={{ color: "gray" }}>
-            <a href="/login">Login</a> or{" "}
-            <a href="/register">Register</a> to add this game
-            to your Wishlist, Favorites or Played list.
+        {message && (
+          <p className={`alert ${message.type}`}>
+            {message.text}
           </p>
+        )}
+
+        <div className="game-detail-header">
+          {game.background_image && (
+            <img
+              src={game.background_image}
+              alt={game.name}
+              className="game-detail-image"
+            />
+          )}
+
+          <div className="game-detail-main">
+            <h1 className="game-detail-title">{game.name}</h1>
+
+            <div className="game-detail-meta">
+              <p>
+                <strong>Rating:</strong>{" "}
+                {game.rating ?? "N/A"}
+              </p>
+              <p>
+                <strong>Released:</strong>{" "}
+                {game.released ?? "Unknown"}
+              </p>
+            </div>
+
+            <div className="game-detail-actions">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => addToLibrary("wishlist")}
+                    disabled={!!addingStatus || wishlist}
+                  >
+                    {wishlist
+                      ? "In Wishlist"
+                      : addingStatus === "wishlist"
+                      ? "Adding…"
+                      : "Add to Wishlist"}
+                  </button>
+
+                  <button
+                    onClick={() => addToLibrary("favorite")}
+                    disabled={!!addingStatus || favorite}
+                  >
+                    {favorite
+                      ? "In Favorites"
+                      : addingStatus === "favorite"
+                      ? "Adding…"
+                      : "Add to Favorites"}
+                  </button>
+
+                  <button
+                    onClick={() => addToLibrary("played")}
+                    disabled={!!addingStatus || played}
+                  >
+                    {played
+                      ? "Marked as Played"
+                      : addingStatus === "played"
+                      ? "Adding…"
+                      : "Mark as Played"}
+                  </button>
+                </>
+              ) : (
+                <p className="game-detail-login-hint">
+                  <Link to="/login">Login</Link> or{" "}
+                  <Link to="/register">Register</Link> to add this game
+                  to your Wishlist, Favorites or Played list.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {game.description_raw && (
+          <div className="game-detail-description">
+            <h3>Description</h3>
+            <p>{game.description_raw}</p>
+          </div>
         )}
       </div>
     </div>

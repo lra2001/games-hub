@@ -366,6 +366,252 @@ a:hover {
 }
 
 /* =========================================================
+   Search Page & Game Grid
+   ========================================================= */
+.search-page {
+  padding: 1.5rem;
+}
+
+.search-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-filters select {
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--color-surface-light);
+  color: var(--color-text);
+}
+
+.search-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-filters label {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Game cards grid */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.game-card {
+  background: var(--color-surface);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+}
+
+.game-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.game-card-body {
+  padding: 0.75rem 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.game-card-body h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.game-meta {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.game-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.game-actions button {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.game-actions button:hover {
+  background: var(--color-accent-hover);
+}
+
+.game-hint {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.75);
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.pagination button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  border: none;
+  background: var(--color-surface-light);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* =========================================================
+   Game Detail Page
+   ========================================================= */
+.game-detail-page {
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.game-detail-card {
+  width: 100%;
+  max-width: 960px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem 2rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Top link / breadcrumb */
+.game-detail-topbar {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.game-detail-topbar a {
+  color: rgba(255,255,255,0.7);
+}
+
+.game-detail-topbar a:hover {
+  color: var(--color-accent-light);
+}
+
+/* Header: image + info */
+.game-detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.game-detail-image {
+  width: 280px;
+  max-width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.game-detail-main {
+  flex: 1;
+  min-width: 220px;
+}
+
+.game-detail-title {
+  margin: 0 0 0.5rem 0;
+}
+
+.game-detail-meta p {
+  margin: 0.15rem 0;
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* Actions */
+.game-detail-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.game-detail-actions button {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.game-detail-actions button:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.game-detail-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Login hint when not authenticated */
+.game-detail-login-hint {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.8);
+  margin-top: 0.5rem;
+}
+
+/* Description section */
+.game-detail-description {
+  margin-top: 0.75rem;
+}
+
+.game-detail-description h3 {
+  margin-bottom: 0.5rem;
+}
+
+.game-detail-description p {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.88);
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 @media (max-width: 768px) {
@@ -381,5 +627,17 @@ a:hover {
 
   .dashboard-main {
     padding: 1rem;
+  }
+  .game-detail-card {
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
+
+  .game-detail-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .game-detail-main {
+    width: 100%;
   }
 }

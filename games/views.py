@@ -16,11 +16,13 @@ class GameSearchView(APIView):
         if not query:
             return Response({"results": []}, status=status.HTTP_200_OK)
 
+        page = request.GET.get("page", 1)
         url = f"{settings.RAWG_BASE_URL}/games"
         params = {
             "search": query,
             "key": settings.RAWG_API_KEY,
             "page_size": 10,
+            "page": page,
         }
 
         try:

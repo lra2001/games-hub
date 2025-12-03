@@ -3,28 +3,49 @@ import { useSearchParams, Link } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
+const PAGE_SIZE = 10;
+
 export default function GameSearch() {
   const { user } = useAuth();
+
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [feedback, setFeedback] = useState(null); // { type, text }
+  const [feedback, setFeedback] = useState(null);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+
+  const [page, setPage] = useState(pageParam);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [platformFilter, setPlatformFilter] = useState("all");
+  const [genreFilter, setGenreFilter] = useState("all");
+
+  // keep local page in sync with URL
+  useEffect(() => {
+    setPage(pageParam);
+  }, [pageParam]);
 
   useEffect(() => {
     async function fetchGames() {
       if (!query) {
         setGames([]);
+        setTotalPages(1);
         return;
       }
       setLoading(true);
       setError(null);
       setFeedback(null);
       try {
-        const res = await api.get("games/search/", { params: { query } });
+        const res = await api.get("games/search/", {
+          params: { query, page },
+        });
         setGames(res.data.results || []);
+        const count = res.data.count || 0;
+        setTotalPages(count ? Math.max(1, Math.ceil(count / PAGE_SIZE)) : 1);
       } catch (err) {
         console.error(err);
         setError("Failed to fetch games");
@@ -32,16 +53,77 @@ export default function GameSearch() {
         setLoading(false);
       }
     }
+
     fetchGames();
-  }, [query]);
+  }, [query, page]);
+
+  function updatePage(newPage) {
+    const safePage = Math.min(Math.max(newPage, 1), totalPages || 1);
+    setPage(safePage);
+    const params = { query };
+    if (safePage !== 1) params.page = String(safePage);
+    setSearchParams(params);
+  }
+
+  // Build platform + genre filter options from current results
+  const platformOptions = (() => {
+    const map = new Map();
+    games.forEach((g) => {
+      (g.platforms || []).forEach((p) => {
+        const platform = p.platform || p;
+        if (platform && !map.has(platform.id)) {
+          map.set(platform.id, platform.name);
+        }
+      });
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  })();
+
+  const genreOptions = (() => {
+    const map = new Map();
+    games.forEach((g) => {
+      (g.genres || []).forEach((genre) => {
+        if (genre && !map.has(genre.id)) {
+          map.set(genre.id, genre.name);
+        }
+      });
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  })();
+
+  function passesRatingFilter(game) {
+    if (ratingFilter === "all") return true;
+    const minRating = Number(ratingFilter);
+    const r = game.rating || 0;
+    return r >= minRating;
+  }
+
+  function passesPlatformFilter(game) {
+    if (platformFilter === "all") return true;
+    const targetId = Number(platformFilter);
+    return (game.platforms || []).some((p) => {
+      const platform = p.platform || p;
+      return platform && platform.id === targetId;
+    });
+  }
+
+  function passesGenreFilter(game) {
+    if (genreFilter === "all") return true;
+    return (game.genres || []).some(
+      (genre) => String(genre.id) === genreFilter
+    );
+  }
+
+  const filteredGames = games.filter(
+    (g) =>
+      passesRatingFilter(g) &&
+      passesPlatformFilter(g) &&
+      passesGenreFilter(g)
+  );
 
   async function addToLibrary(game, status = "wishlist") {
     if (!user) {
       setFeedback({
-        type: "error",
-        text: "Please login or register to add games to your library.",
-      });
-      console.log("feedback set:", {
         type: "error",
         text: "Please login or register to add games to your library.",
       });
@@ -53,30 +135,77 @@ export default function GameSearch() {
         game_id: game.id,
         status,
       });
-      const msg = {
+      setFeedback({
         type: "success",
         text: `${game.name} added to your ${status} list.`,
-      };
-      setFeedback(msg);
-      console.log("feedback set:", msg);
+      });
     } catch (err) {
       console.error(err);
-      const msg = {
+      setFeedback({
         type: "error",
         text:
           err.response?.data?.error ||
           "Failed to add game to your library.",
-      };
-      setFeedback(msg);
-      console.log("feedback set:", msg);
+      });
     }
   }
 
   return (
-    <div>
-      <h1>Search Results {query && `for "${query}"`}</h1>
+    <div className="search-page">
+      <div className="search-header">
+        <h1>Search Results {query && `for "${query}"`}</h1>
 
-      {/* INLINE FEEDBACK */}
+        <div className="search-filters">
+          {/* Rating filter */}
+          <label>
+            Rating:
+            <select
+              value={ratingFilter}
+              onChange={(e) => setRatingFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="5">5★ &amp; up</option>
+              <option value="4">4★ &amp; up</option>
+              <option value="3">3★ &amp; up</option>
+              <option value="2">2★ &amp; up</option>
+              <option value="1">1★ &amp; up</option>
+            </select>
+          </label>
+
+          {/* Platform filter */}
+          <label>
+            Platform:
+            <select
+              value={platformFilter}
+              onChange={(e) => setPlatformFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              {platformOptions.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {/* Genre filter */}
+          <label>
+            Genre:
+            <select
+              value={genreFilter}
+              onChange={(e) => setGenreFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              {genreOptions.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+
       {feedback && (
         <p className={`alert ${feedback.type}`}>
           {feedback.text}
@@ -85,41 +214,71 @@ export default function GameSearch() {
 
       {loading && <p>Loading…</p>}
       {error && <p className="alert error">{error}</p>}
-      {games.length === 0 && !loading && <p>No results</p>}
+      {!loading && filteredGames.length === 0 && <p>No results</p>}
 
-      <ul>
-        {games.map((g) => (
-          <li key={g.id}>
+      <div className="game-grid">
+        {filteredGames.map((g) => (
+          <div key={g.id} className="game-card">
             {g.background_image && (
-              <img src={g.background_image} alt={g.name} width="100" />
+              <img src={g.background_image} alt={g.name} />
             )}
-
-            <strong>
-              <Link to={`/games/${g.id}`}>{g.name}</Link>
-            </strong>
-
-            {user ? (
-              <div>
-                <button onClick={() => addToLibrary(g, "wishlist")}>
-                  Wishlist
-                </button>
-                <button onClick={() => addToLibrary(g, "favorite")}>
-                  Favorite
-                </button>
-                <button onClick={() => addToLibrary(g, "played")}>
-                  Played
-                </button>
-              </div>
-            ) : (
-              <p style={{ color: "gray" }}>
-                <a href="/login">Login</a> or{" "}
-                <a href="/register">Register</a> to add games to your
-                Wishlist, Favorites or Played.
+            <div className="game-card-body">
+              <h3>
+                <Link
+                  to={`/games/${g.id}?query=${encodeURIComponent(
+                    query
+                  )}&page=${page}`}
+                >
+                  {g.name}
+                </Link>
+              </h3>
+              <p className="game-meta">
+                ⭐ {g.rating ?? "N/A"} ·{" "}
+                {g.released || "Release date unknown"}
               </p>
-            )}
-          </li>
+
+              {user ? (
+                <div className="game-actions">
+                  <button onClick={() => addToLibrary(g, "wishlist")}>
+                    Wishlist
+                  </button>
+                  <button onClick={() => addToLibrary(g, "favorite")}>
+                    Favorite
+                  </button>
+                  <button onClick={() => addToLibrary(g, "played")}>
+                    Played
+                  </button>
+                </div>
+              ) : (
+                <p className="game-hint">
+                  <Link to="/login">Login</Link> or{" "}
+                  <Link to="/register">Register</Link> to save this game.
+                </p>
+              )}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
+
+      {!loading && totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => updatePage(page - 1)}
+            disabled={page <= 1}
+          >
+            Previous
+          </button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => updatePage(page + 1)}
+            disabled={page >= totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
