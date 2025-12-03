@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -20,9 +20,9 @@ export default function Header() {
 
   return (
     <header className="header">
-      {/* Logo */}
+      {/* Logo – goes to /dashboard if logged in, otherwise home */}
       <div className="logo">
-        <Link to="/">GamesHub</Link>
+        <Link to={user ? "/dashboard" : "/"}>GamesHub</Link>
       </div>
 
       {/* Search bar */}
@@ -31,12 +31,24 @@ export default function Header() {
         <button type="submit">Search</button>
       </form>
 
-      {/* Right side: login/register OR user + logout */}
+      {/* Right side – auth controls */}
       <div className="auth-links">
         {user ? (
           <>
-            <span>Hello, {user.first_name || user.username}</span>
-            <button onClick={handleLogout} style={{ marginLeft: "1rem" }}>
+            {/* Dashboard shortcut */}
+            <Link to="/dashboard">Dashboard</Link>
+
+            {/* Greeting */}
+            <span style={{ marginLeft: "1rem" }}>
+              Hello {user.first_name || user.username}
+            </span>
+
+            {/* Logout button */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              style={{ marginLeft: "1rem" }}
+            >
               Logout
             </button>
           </>

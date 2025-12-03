@@ -5,23 +5,30 @@ import Login from "./auth/Login.jsx";
 import Register from "./auth/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import GameSearch from "./pages/GameSearch.jsx";
+import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 
 export default function App() {
-  function handleSearch(query) {
-    // Redirect to search page with query
-    window.location.href = `/search?query=${encodeURIComponent(query)}`;
-  }
-
   return (
     <BrowserRouter>
-      <Header onSearch={handleSearch} />
+      <Header />
 
       <Routes>
+        {/* Public pages */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/dashboard/*" element={<Dashboard />} />
+        {/* Protected dashboard */}
+        <Route
+          path="/dashboard/*"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Search page */}
         <Route path="/search" element={<GameSearch />} />
       </Routes>
     </BrowserRouter>

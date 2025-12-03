@@ -1,14 +1,17 @@
 import { useState } from "react";
 import api from "../api/axios.js";
 import { useAuth } from "./AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Login() {
-  const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+
+  const from = location.state?.from;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -24,26 +27,40 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
+    <div className="auth-container">
+      <h1>Login</h1>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {from && (
+        <p className="info">
+          Please login or register to access your dashboard.
+        </p>
+      )}
 
-      <input
-        type="text"
-        placeholder="Username"
-        value={form.username}
-        onChange={(e) => setForm({ ...form, username: e.target.value })}
-      />
+      {error && <p className="error">{error}</p>}
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-      />
+      <form onSubmit={handleSubmit} className="auth-form">
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={form.username}
+          onChange={(e) => setForm({ ...form, username: e.target.value })}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
 
-      <button type="submit">Login</button>
-    </form>
+      <p>
+        Don’t have an account? <a href="/register">Register here</a>
+      </p>
+    </div>
   );
 }
