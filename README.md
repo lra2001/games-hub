@@ -120,3 +120,75 @@ Click http://localhost:5173/ to run app
 ```bash
 npm run dev
 ```
+
+---
+
+## Progressive Web App (PWA)
+
+The goal is to make the app installable and available offline using:
+- **`vite-plugin-pwa`**
+- Service Worker for caching
+- `manifest.json` for icons and app metadata
+
+---
+
+## Features (Planned)
+
+- User authentication & profile management
+- Browse and review games
+- Rate and comment on games
+- Dashboard for user activity
+- PWA support (installable and offline-ready)
+- API integration for external game data
+- Add tests
+  - Create account
+  - Log in/ Log Out
+  - Edit Account
+  - Navigate through different tabs
+  - Search for games
+
+## Future Features
+- 2FA
+- Moderate reviews (edit/delete reviews)
+- TOS (able to sanction accounts)
+
+## Resources
+### w3schools
+- [Python](https://www.w3schools.com/python/default.asp)
+- [Python RegEx](https://www.w3schools.com/python/python_regex.asp)
+- [Django](https://www.w3schools.com/django/index.php)
+- [postgreSQL](https://www.w3schools.com/postgresql/index.php)
+- [React](https://www.w3schools.com/react/default.asp)
+- [Node.js](https://www.w3schools.com/nodejs/)
+- [npm](https://www.w3schools.com/whatis/whatis_npm.asp)
+- [Bootsrap 5](https://www.w3schools.com/bootstrap5/)
+
+
+### Official Documentation
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [Django re-path()](https://docs.djangoproject.com/en/5.2/ref/urls/#re-path)
+- [Class-based views](https://docs.djangoproject.com/en/5.2/topics/class-based-views/#usage-in-your-urlconf)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Psycopg](https://www.psycopg.org/docs/install.html)
+- [nodeJS](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs)
+- [npm](https://docs.npmjs.com/)
+- [React](https://react.dev/)
+- [Vite](https://vite.dev/guide/)
+- [React Router](https://reactrouter.com/home)
+- [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
+- [Bootstrap Icons](https://icons.getbootstrap.com/)
+- [git](https://git-scm.com/docs)
+- [GitHub](https://github.com/)
+- [Render](https://render.com/docs)
+- [PWA - Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/What_is_a_progressive_web_app)
+
+### Installation
+- [psycopg2](https://pypi.org/project/psycopg2/)
+- [python-dotenv](https://pypi.org/project/python-dotenv/)
+- [react-router](https://www.npmjs.com/package/react-router)
+- [@popperjs/core](https://www.npmjs.com/package/@popperjs/core)
+- [bootstrap](https://www.npmjs.com/package/bootstrap?activeTab=versions)
+
+## Known Issues
+
+- TBC
