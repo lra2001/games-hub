@@ -121,6 +121,60 @@ Click http://localhost:5173/ to run app
 npm run dev
 ```
 
+## Automated Tests Summary
+Automated tests were implemented using Django’s built-in unittest framework and Django REST Framework’s APITestCase. Tests focus on ensuring that authentication, library management, and external API integration behave correctly under different scenarios.
+
+### 1. Users App
+Includes tests for:
+- User registration
+- JWT login (token generation)
+- Authenticated profile access (/api/users/me/)
+- Password validation & unique email constraints
+
+These tests confirm that the authentication system is secure, consistent, and follows the expected workflow.
+
+### 2. Library App
+Covers:
+- Authentication enforcement for all library endpoints
+- Creating, listing, and deleting library items
+- Adding items using the add-from-rawg/ endpoint
+- Validating duplicate entries
+- Ensuring correct filtering by user
+
+RAWG API calls are mocked to prevent external dependencies during testing.
+
+### 3. Games App
+Tests the game search endpoint:
+- /api/games/search/?query= returns expected structure
+- RAWG API responses are mocked using unittest.mock.patch
+- Ensures backend handles external API failures gracefully
+
+### 4. How to run tests
+You can run app specific tests or all by using the commands below:
+
+Test specific App:
+```bash
+python manage.py test users
+python manage.py test library
+python manage.py test games
+```
+
+Run all Tests:
+```bash
+python manage.py test
+```
+
+### 5. Tools Used
+- unittest — Python’s built-in testing framework
+- rest_framework.test.APITestCase — DRF utilities for API testing
+- unittest.mock.patch — Mocks external RAWG API calls
+
+### 6. Planned Future Tests
+- Frontend component tests (React Testing Library)
+- Browser-based tests for PWA functionality
+- Performance tests for the games search endpoint
+- Integration tests for full "search → detail → add to library" workflow
+
 ---
 
 ## Progressive Web App (PWA)
