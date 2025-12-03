@@ -228,13 +228,14 @@ The goal is to make the app installable and available offline using:
 - [npm](https://docs.npmjs.com/)
 - [React](https://react.dev/)
 - [Vite](https://vite.dev/guide/)
+- [PWA Vite Plugin](https://vite-pwa-org.netlify.app/)
+- [PWA - Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/What_is_a_progressive_web_app)
 - [React Router](https://reactrouter.com/home)
 - [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
 - [Bootstrap Icons](https://icons.getbootstrap.com/)
 - [git](https://git-scm.com/docs)
 - [GitHub](https://github.com/)
 - [Render](https://render.com/docs)
-- [PWA - Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/What_is_a_progressive_web_app)
 
 ### Installation
 - [psycopg2](https://pypi.org/project/psycopg2/)
