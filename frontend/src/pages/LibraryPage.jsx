@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-export default function LibraryPage({ items, status, onRemove }) {
+
+export default function LibraryPage({ status, items = [], onRemove }) {
   const filtered = items.filter((item) => item.status === status);
   const label = status.charAt(0).toUpperCase() + status.slice(1);
 
@@ -9,33 +10,43 @@ export default function LibraryPage({ items, status, onRemove }) {
 
       {filtered.length === 0 && <p>No games added yet.</p>}
 
-      <ul className="library-list">
-        {filtered.map((item) => (
-          <li key={item.id}>
-            {item.background_image && (
-              <img
-                src={item.background_image}
-                alt={item.title}
-                width={80}
-                style={{ marginRight: "0.5rem" }}
-              />
-            )}
+      {filtered.length > 0 && (
+        <div className="search-results-card">
+          <div className="game-grid">
+            {filtered.map((item) => (
+              <div key={item.id} className="game-card">
+                <Link
+                  to={`/games/${item.game_id}`}
+                  className="game-card-link"
+                >
+                  {item.background_image && (
+                    <img
+                      src={item.background_image}
+                      alt={item.title || `Game #${item.game_id}`}
+                    />
+                  )}
+                  <div className="game-card-body">
+                    <h3>{item.title || `Game #${item.game_id}`}</h3>
+                    <p className="game-meta">
+                      Status: {label}
+                      {item.rating ? ` · ⭐ ${item.rating}` : ""}
+                    </p>
+                  </div>
+                </Link>
 
-            <strong>
-              <Link to={`/games/${item.game_id}`}>
-                {item.title || `Game #${item.game_id}`}
-              </Link>
-            </strong>
-
-            <button
-              onClick={() => onRemove(item.id)}
-              style={{ marginLeft: "0.5rem" }}
-            >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
+                <div className="game-actions">
+                  <button
+                    className="danger"
+                    onClick={() => onRemove(item.id)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

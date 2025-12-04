@@ -22,7 +22,7 @@ export default function Header() {
     <header className="header">
       {/* Logo – goes to /dashboard if logged in, otherwise home */}
       <div className="logo">
-        <Link to={user ? "/dashboard" : "/"}>GamesHub</Link>
+        <Link to="/">GamesHub</Link>
       </div>
 
       {/* Search bar */}

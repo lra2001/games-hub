@@ -216,48 +216,50 @@ export default function GameSearch() {
       {error && <p className="alert error">{error}</p>}
       {!loading && filteredGames.length === 0 && <p>No results</p>}
 
-      <div className="game-grid">
-        {filteredGames.map((g) => (
-          <div key={g.id} className="game-card">
-            {g.background_image && (
-              <img src={g.background_image} alt={g.name} />
-            )}
-            <div className="game-card-body">
-              <h3>
-                <Link
-                  to={`/games/${g.id}?query=${encodeURIComponent(
-                    query
-                  )}&page=${page}`}
-                >
-                  {g.name}
-                </Link>
-              </h3>
-              <p className="game-meta">
-                ⭐ {g.rating ?? "N/A"} ·{" "}
-                {g.released || "Release date unknown"}
-              </p>
-
-              {user ? (
-                <div className="game-actions">
-                  <button onClick={() => addToLibrary(g, "wishlist")}>
-                    Wishlist
-                  </button>
-                  <button onClick={() => addToLibrary(g, "favorite")}>
-                    Favorite
-                  </button>
-                  <button onClick={() => addToLibrary(g, "played")}>
-                    Played
-                  </button>
-                </div>
-              ) : (
-                <p className="game-hint">
-                  <Link to="/login">Login</Link> or{" "}
-                  <Link to="/register">Register</Link> to save this game.
-                </p>
+      <div className="search-results-card">
+        <div className="game-grid">
+          {filteredGames.map((g) => (
+            <div key={g.id} className="game-card">
+              {g.background_image && (
+                <img src={g.background_image} alt={g.name} />
               )}
+              <div className="game-card-body">
+                <h3>
+                  <Link
+                    to={`/games/${g.id}?query=${encodeURIComponent(
+                      query
+                    )}&page=${page}`}
+                  >
+                    {g.name}
+                  </Link>
+                </h3>
+                <p className="game-meta">
+                  ⭐ {g.rating ?? "N/A"} ·{" "}
+                  {g.released || "Release date unknown"}
+                </p>
+
+                {user ? (
+                  <div className="game-actions">
+                    <button onClick={() => addToLibrary(g, "wishlist")}>
+                      Wishlist
+                    </button>
+                    <button onClick={() => addToLibrary(g, "favorite")}>
+                      Favorite
+                    </button>
+                    <button onClick={() => addToLibrary(g, "played")}>
+                      Played
+                    </button>
+                  </div>
+                ) : (
+                  <p className="game-hint">
+                    <Link to="/login">Login</Link> or{" "}
+                    <Link to="/register">Register</Link> to save this game.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {!loading && totalPages > 1 && (
