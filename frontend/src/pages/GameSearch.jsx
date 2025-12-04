@@ -220,19 +220,16 @@ export default function GameSearch() {
         <div className="game-grid">
           {filteredGames.map((g) => (
             <div key={g.id} className="game-card">
-              {g.background_image && (
-                <img src={g.background_image} alt={g.name} />
-              )}
-              <div className="game-card-body">
-                <h3>
-                  <Link
+              <Link
                     to={`/games/${g.id}?query=${encodeURIComponent(
                       query
                     )}&page=${page}`}
                   >
-                    {g.name}
-                  </Link>
-                </h3>
+                <img src={g.background_image || "/images/no-image.png"} alt={g.name} />
+                <div className="game-card-body">
+                  <h3>{g.name}</h3>
+                </div>
+              </Link>
                 <p className="game-meta">
                   ⭐ {g.rating ?? "N/A"} ·{" "}
                   {g.released || "Release date unknown"}
@@ -253,10 +250,10 @@ export default function GameSearch() {
                 ) : (
                   <p className="game-hint">
                     <Link to="/login">Login</Link> or{" "}
-                    <Link to="/register">Register</Link> to save this game.
+                    <Link to="/register">Register</Link> to add this game
+                  to your Wishlist, Favorites or Played list.
                   </p>
                 )}
-              </div>
             </div>
           ))}
         </div>

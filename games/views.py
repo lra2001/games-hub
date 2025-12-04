@@ -4,26 +4,40 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, permissions
 
-# Create your views here.
 
 class GameSearchView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         query = request.GET.get("query", "").strip()
-
-        # If there is no input from user, return empty results instead of 400
-        if not query:
-            return Response({"results": []}, status=status.HTTP_200_OK)
-
         page = request.GET.get("page", 1)
+        category = request.GET.get("category", "").strip().lower()
+
         url = f"{settings.RAWG_BASE_URL}/games"
         params = {
-            "search": query,
             "key": settings.RAWG_API_KEY,
             "page_size": 10,
             "page": page,
         }
+
+        # Use RAWG search when user types a query
+        if query:
+            params["search"] = query
+
+        # Map category names to RAWG ordering
+        ordering_map = {
+            "popular": "-rating",      # Most Popular
+            "new": "-released",        # New Releases
+            "average": "-metacritic",  # Average rating
+        }
+        ordering = ordering_map.get(category)
+
+        # Default to popular if no query or ordering is specified
+        if not query and not ordering:
+            ordering = "-rating"
+
+        if ordering:
+            params["ordering"] = ordering
 
         try:
             rawg_response = requests.get(url, params=params)
@@ -33,6 +47,7 @@ class GameSearchView(APIView):
 
         data = rawg_response.json()
         return Response(data, status=status.HTTP_200_OK)
+
 
 class GameDetailView(APIView):
     permission_classes = [permissions.AllowAny]

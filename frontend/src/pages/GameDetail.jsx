@@ -132,13 +132,11 @@ export default function GameDetail() {
         )}
 
         <div className="game-detail-header">
-          {game.background_image && (
             <img
-              src={game.background_image}
+              src={game.background_image || "/images/no-image.png"}
               alt={game.name}
               className="game-detail-image"
             />
-          )}
 
           <div className="game-detail-main">
             <h1 className="game-detail-title">{game.name}</h1>

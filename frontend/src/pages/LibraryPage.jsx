@@ -19,12 +19,10 @@ export default function LibraryPage({ status, items = [], onRemove }) {
                   to={`/games/${item.game_id}`}
                   className="game-card-link"
                 >
-                  {item.background_image && (
                     <img
-                      src={item.background_image}
+                      src={item.background_image || "/images/no-image.png"}
                       alt={item.title || `Game #${item.game_id}`}
                     />
-                  )}
                   <div className="game-card-body">
                     <h3>{item.title || `Game #${item.game_id}`}</h3>
                     <p className="game-meta">
