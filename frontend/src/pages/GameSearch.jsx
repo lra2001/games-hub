@@ -383,7 +383,7 @@ export default function GameSearch() {
                       onClick={() => addToLibrary(g, "played")}
                       disabled={stat.played}
                     >
-                      {stat.played ? "Marked as Played" : "Played"}
+                      {stat.played ? "In Played" : "Played"}
                     </button>
                   </div>
                 ) : (

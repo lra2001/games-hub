@@ -143,7 +143,7 @@ export default function GameDetail() {
 
             <div className="game-detail-meta">
               <p>
-                <strong>Rating:</strong>{" "}
+                ⭐{" "}
                 {game.rating ?? "N/A"}
               </p>
               <p>
@@ -182,10 +182,10 @@ export default function GameDetail() {
                     disabled={!!addingStatus || played}
                   >
                     {played
-                      ? "Marked as Played"
+                      ? "In Played"
                       : addingStatus === "played"
                       ? "Adding…"
-                      : "Mark as Played"}
+                      : "In Played"}
                   </button>
                 </>
               ) : (
