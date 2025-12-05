@@ -316,10 +316,17 @@ export default function GameSearch() {
                   </div>
                 </Link>
 
-                <p className="game-meta">
-                  ⭐ {g.rating ?? "N/A"} ·{" "}
-                  {g.released || "Release date unknown"}
-                </p>
+                <div className="game-meta">
+                  <p>
+                    <strong>Platforms: </strong>{g.platforms .map((p) => p.platform?.name || p.name) .join(", ") || "Unknown Platform"}
+                  </p>
+                  <p>
+                    <strong>Genre: </strong>{g.genres .map((genre) => genre.name) .join(", ") || "Unknown Genre"}
+                  </p>
+                  <p>
+                    ⭐ {g.rating ?? "N/A"}
+                  </p>
+                </div>
 
                 {user ? (
                   <div className="game-actions">

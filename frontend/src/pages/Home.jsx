@@ -156,7 +156,7 @@ export default function Home() {
   return (
     <div className="search-page">
       <div className="search-header">
-        <h1>Featured Games</h1>
+        <h1>Top Rated Games</h1>
 
         <div className="search-filters">
           {/* Rating filter */}
@@ -230,10 +230,17 @@ export default function Home() {
                     {g.name}
                   </Link>
                 </h3>
-                <p className="game-meta">
-                  ⭐ {g.rating ?? "N/A"} ·{" "}
-                  {g.released || "Release date unknown"}
-                </p>
+                <div className="game-meta">
+                  <p>
+                    <strong>Platforms: </strong>{g.platforms .map((p) => p.platform?.name || p.name) .join(", ") || "Unknown Platform"}
+                  </p>
+                  <p>
+                    <strong>Genre: </strong>{g.genres .map((genre) => genre.name) .join(", ") || "Unknown Genre"}
+                  </p>
+                  <p>
+                    ⭐ {g.rating ?? "N/A"}
+                  </p>
+                </div>
 
                 {user ? (
                   <div className="game-actions">
