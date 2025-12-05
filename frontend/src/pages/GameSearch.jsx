@@ -16,13 +16,16 @@ export default function GameSearch() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
+  const ratingParam = searchParams.get("rating") || "all";
+  const platformParam = searchParams.get("platform") || "all";
+  const genreParam = searchParams.get("genre") || "all";
 
   const [page, setPage] = useState(pageParam);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [ratingFilter, setRatingFilter] = useState("all");
-  const [platformFilter, setPlatformFilter] = useState("all");
-  const [genreFilter, setGenreFilter] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState(ratingParam);
+  const [platformFilter, setPlatformFilter] = useState(platformParam);
+  const [genreFilter, setGenreFilter] = useState(genreParam);
 
   // Check which games are already in user's library
   const [libraryStatuses, setLibraryStatuses] = useState({});
@@ -96,13 +99,32 @@ export default function GameSearch() {
     loadLibrary();
   }, [user]);
 
+  function syncSearchParams(overrides = {}) {
+    const params = {};
+
+    const q = overrides.query ?? query;
+    if (q) params.query = q;
+
+    const pg = overrides.page ?? page;
+    if (pg && pg !== 1) params.page = String(pg);
+
+    const rf = overrides.rating ?? ratingFilter;
+    if (rf && rf !== "all") params.rating = rf;
+
+    const pf = overrides.platform ?? platformFilter;
+    if (pf && pf !== "all") params.platform = pf;
+
+    const gf = overrides.genre ?? genreFilter;
+    if (gf && gf !== "all") params.genre = gf;
+
+    setSearchParams(params);
+}
+
   function updatePage(newPage) {
     const safePage = Math.min(Math.max(newPage, 1), totalPages || 1);
     setPage(safePage);
-    const params = { query };
-    if (safePage !== 1) params.page = String(safePage);
-    setSearchParams(params);
-  }
+    syncSearchParams({ page: safePage });
+}
 
   // Build platform + genre filter options from current results
   const platformOptions = (() => {
@@ -234,7 +256,12 @@ export default function GameSearch() {
             Rating:
             <select
               value={ratingFilter}
-              onChange={(e) => setRatingFilter(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setRatingFilter(value);
+                setPage(1);
+                syncSearchParams({ page: 1, rating: value });
+              }}
             >
               <option value="all">All</option>
               <option value="5">5★</option>
@@ -250,7 +277,12 @@ export default function GameSearch() {
             Platform:
             <select
               value={platformFilter}
-              onChange={(e) => setPlatformFilter(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPlatformFilter(value);
+                setPage(1);
+                syncSearchParams({ page: 1, platform: value });
+              }}
             >
               <option value="all">All</option>
               {platformOptions.map((p) => (
@@ -266,7 +298,12 @@ export default function GameSearch() {
             Genre:
             <select
               value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setGenreFilter(value);
+                setPage(1);
+                syncSearchParams({ page: 1, genre: value });
+              }}
             >
               <option value="all">All</option>
               {genreOptions.map((g) => (
