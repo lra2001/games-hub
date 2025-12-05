@@ -24,11 +24,15 @@ export default function GameSearch() {
   const [platformFilter, setPlatformFilter] = useState("all");
   const [genreFilter, setGenreFilter] = useState("all");
 
+  // Check which games are already in user's library
+  const [libraryStatuses, setLibraryStatuses] = useState({});
+
   // keep local page in sync with URL
   useEffect(() => {
     setPage(pageParam);
   }, [pageParam]);
 
+  // Fetch games from backend (RAWG proxy)
   useEffect(() => {
     async function fetchGames() {
       if (!query) {
@@ -56,6 +60,41 @@ export default function GameSearch() {
 
     fetchGames();
   }, [query, page]);
+
+  // Load user's library once (or when user changes)
+  useEffect(() => {
+    if (!user) {
+      setLibraryStatuses({});
+      return;
+    }
+
+    async function loadLibrary() {
+      try {
+        const res = await api.get("library/");
+        const statusMap = {};
+
+        res.data.forEach((item) => {
+          if (!statusMap[item.game_id]) {
+            statusMap[item.game_id] = {
+              wishlist: false,
+              favorite: false,
+              played: false,
+            };
+          }
+          const s = item.status?.toLowerCase();
+          if (s && statusMap[item.game_id].hasOwnProperty(s)) {
+            statusMap[item.game_id][s] = true;
+          }
+        });
+
+        setLibraryStatuses(statusMap);
+      } catch (err) {
+        console.error("Failed to load library statuses:", err);
+      }
+    }
+
+    loadLibrary();
+  }, [user]);
 
   function updatePage(newPage) {
     const safePage = Math.min(Math.max(newPage, 1), totalPages || 1);
@@ -92,11 +131,31 @@ export default function GameSearch() {
   })();
 
   function passesRatingFilter(game) {
-    if (ratingFilter === "all") return true;
-    const minRating = Number(ratingFilter);
-    const r = game.rating || 0;
-    return r >= minRating;
+  const r = game.rating ?? 0;
+
+  switch (ratingFilter) {
+    case "all":
+      return true;
+
+    case "5":
+      return r === 5;
+
+    case "4-5":
+      return r >= 4 && r < 5;
+
+    case "3-4":
+      return r >= 3 && r < 4;
+
+    case "2-3":
+      return r >= 2 && r < 3;
+
+    case "0-2":
+      return r < 2;
+
+    default:
+      return true;
   }
+}
 
   function passesPlatformFilter(game) {
     if (platformFilter === "all") return true;
@@ -135,6 +194,20 @@ export default function GameSearch() {
         game_id: game.id,
         status,
       });
+
+      // Update local statuses so buttons are disabled immediately
+      setLibraryStatuses((prev) => ({
+        ...prev,
+        [game.id]: {
+          ...(prev[game.id] || {
+            wishlist: false,
+            favorite: false,
+            played: false,
+          }),
+          [status]: true,
+        },
+      }));
+
       setFeedback({
         type: "success",
         text: `${game.name} added to your ${status} list.`,
@@ -164,11 +237,11 @@ export default function GameSearch() {
               onChange={(e) => setRatingFilter(e.target.value)}
             >
               <option value="all">All</option>
-              <option value="5">5★ &amp; up</option>
-              <option value="4">4★ &amp; up</option>
-              <option value="3">3★ &amp; up</option>
-              <option value="2">2★ &amp; up</option>
-              <option value="1">1★ &amp; up</option>
+              <option value="5">5★</option>
+              <option value="4-5">4★ to &lt; 5★</option>
+              <option value="3-4">3★ to &lt; 4★</option>
+              <option value="2-3">2★ to &lt; 3★</option>
+              <option value="0-2">0★ to &lt; 2★</option>
             </select>
           </label>
 
@@ -218,18 +291,31 @@ export default function GameSearch() {
 
       <div className="search-results-card">
         <div className="game-grid">
-          {filteredGames.map((g) => (
-            <div key={g.id} className="game-card">
-              <Link
-                    to={`/games/${g.id}?query=${encodeURIComponent(
-                      query
-                    )}&page=${page}`}
-                  >
-                <img src={g.background_image || "/images/no-image.png"} alt={g.name} />
-                <div className="game-card-body">
-                  <h3>{g.name}</h3>
-                </div>
-              </Link>
+          {filteredGames.map((g) => {
+            const stat =
+              libraryStatuses[g.id] || {
+                wishlist: false,
+                favorite: false,
+                played: false,
+              };
+
+            return (
+              <div key={g.id} className="game-card">
+                <Link
+                  to={`/games/${g.id}?query=${encodeURIComponent(
+                    query
+                  )}&page=${page}`}
+                  className="game-card-link"
+                >
+                  <img
+                    src={g.background_image || "/images/no-image.png"}
+                    alt={g.name}
+                  />
+                  <div className="game-card-body">
+                    <h3>{g.name}</h3>
+                  </div>
+                </Link>
+
                 <p className="game-meta">
                   ⭐ {g.rating ?? "N/A"} ·{" "}
                   {g.released || "Release date unknown"}
@@ -237,25 +323,35 @@ export default function GameSearch() {
 
                 {user ? (
                   <div className="game-actions">
-                    <button onClick={() => addToLibrary(g, "wishlist")}>
-                      Wishlist
+                    <button
+                      onClick={() => addToLibrary(g, "wishlist")}
+                      disabled={stat.wishlist}
+                    >
+                      {stat.wishlist ? "In Wishlist" : "Wishlist"}
                     </button>
-                    <button onClick={() => addToLibrary(g, "favorite")}>
-                      Favorite
+                    <button
+                      onClick={() => addToLibrary(g, "favorite")}
+                      disabled={stat.favorite}
+                    >
+                      {stat.favorite ? "In Favorites" : "Favorite"}
                     </button>
-                    <button onClick={() => addToLibrary(g, "played")}>
-                      Played
+                    <button
+                      onClick={() => addToLibrary(g, "played")}
+                      disabled={stat.played}
+                    >
+                      {stat.played ? "Marked as Played" : "Played"}
                     </button>
                   </div>
                 ) : (
                   <p className="game-hint">
                     <Link to="/login">Login</Link> or{" "}
                     <Link to="/register">Register</Link> to add this game
-                  to your Wishlist, Favorites or Played list.
+                    to your Wishlist, Favorites or Played list.
                   </p>
                 )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 

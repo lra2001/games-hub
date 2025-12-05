@@ -75,11 +75,31 @@ export default function Home() {
   })();
 
   function passesRatingFilter(game) {
-    if (ratingFilter === "all") return true;
-    const minRating = Number(ratingFilter);
-    const r = game.rating || 0;
-    return r >= minRating;
+  const r = game.rating ?? 0;
+
+  switch (ratingFilter) {
+    case "all":
+      return true;
+
+    case "5":
+      return r === 5;
+
+    case "4-5":
+      return r >= 4 && r < 5;
+
+    case "3-4":
+      return r >= 3 && r < 4;
+
+    case "2-3":
+      return r >= 2 && r < 3;
+
+    case "0-2":
+      return r < 2;
+
+    default:
+      return true;
   }
+}
 
   function passesPlatformFilter(game) {
     if (platformFilter === "all") return true;
@@ -147,11 +167,11 @@ export default function Home() {
               onChange={(e) => setRatingFilter(e.target.value)}
             >
               <option value="all">All</option>
-              <option value="5">5★ &amp; up</option>
-              <option value="4">4★ &amp; up</option>
-              <option value="3">3★ &amp; up</option>
-              <option value="2">2★ &amp; up</option>
-              <option value="1">1★ &amp; up</option>
+              <option value="5">5★</option>
+              <option value="4-5">4★ to &lt; 5★</option>
+              <option value="3-4">3★ to &lt; 4★</option>
+              <option value="2-3">2★ to &lt; 3★</option>
+              <option value="0-2">0★ to &lt; 2★</option>
             </select>
           </label>
 

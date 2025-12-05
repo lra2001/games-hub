@@ -531,6 +531,11 @@ button.danger:hover:not(:disabled) {
   background: var(--color-accent-hover);
 }
 
+.game-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .game-hint {
   font-size: 0.85rem;
   color: var(--text-soft);
