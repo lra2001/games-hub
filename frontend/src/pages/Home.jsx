@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
@@ -8,17 +8,48 @@ const PAGE_SIZE = 10;
 export default function Home() {
   const { user } = useAuth();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+  const ratingParam = searchParams.get("rating") || "all";
+  const platformParam = searchParams.get("platform") || "all";
+  const genreParam = searchParams.get("genre") || "all";
+
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(pageParam);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [ratingFilter, setRatingFilter] = useState("all");
-  const [platformFilter, setPlatformFilter] = useState("all");
-  const [genreFilter, setGenreFilter] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState(ratingParam);
+  const [platformFilter, setPlatformFilter] = useState(platformParam);
+  const [genreFilter, setGenreFilter] = useState(genreParam);
+
+  // keep page in sync with URL change
+  useEffect(() => {
+    setPage(pageParam);
+  }, [pageParam]);
+
+  // helper: sync state -> URL
+  function syncSearchParams(overrides = {}) {
+    const params = {};
+
+    const pg = overrides.page ?? page;
+    if (pg && pg !== 1) params.page = String(pg);
+
+    const rf = overrides.rating ?? ratingFilter;
+    if (rf && rf !== "all") params.rating = rf;
+
+    const pf = overrides.platform ?? platformFilter;
+    if (pf && pf !== "all") params.platform = pf;
+
+    const gf = overrides.genre ?? genreFilter;
+    if (gf && gf !== "all") params.genre = gf;
+
+    setSearchParams(params);
+  }
 
   useEffect(() => {
     async function fetchGames() {
@@ -46,6 +77,7 @@ export default function Home() {
   function updatePage(newPage) {
     const safePage = Math.min(Math.max(newPage, 1), totalPages || 1);
     setPage(safePage);
+    syncSearchParams({ page: safePage });
   }
 
   // Build platform + genre filter options
@@ -75,31 +107,25 @@ export default function Home() {
   })();
 
   function passesRatingFilter(game) {
-  const r = game.rating ?? 0;
+    const r = game.rating ?? 0;
 
-  switch (ratingFilter) {
-    case "all":
-      return true;
-
-    case "5":
-      return r === 5;
-
-    case "4-5":
-      return r >= 4 && r < 5;
-
-    case "3-4":
-      return r >= 3 && r < 4;
-
-    case "2-3":
-      return r >= 2 && r < 3;
-
-    case "0-2":
-      return r < 2;
-
-    default:
-      return true;
+    switch (ratingFilter) {
+      case "all":
+        return true;
+      case "5":
+        return r === 5;
+      case "4-5":
+        return r >= 4 && r < 5;
+      case "3-4":
+        return r >= 3 && r < 4;
+      case "2-3":
+        return r >= 2 && r < 3;
+      case "0-2":
+        return r < 2;
+      default:
+        return true;
+    }
   }
-}
 
   function passesPlatformFilter(game) {
     if (platformFilter === "all") return true;
@@ -164,7 +190,12 @@ export default function Home() {
             Rating:
             <select
               value={ratingFilter}
-              onChange={(e) => setRatingFilter(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setRatingFilter(value);
+                setPage(1);
+                syncSearchParams({ page: 1, rating: value });
+              }}
             >
               <option value="all">All</option>
               <option value="5">5★</option>
@@ -180,7 +211,12 @@ export default function Home() {
             Platform:
             <select
               value={platformFilter}
-              onChange={(e) => setPlatformFilter(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPlatformFilter(value);
+                setPage(1);
+                syncSearchParams({ page: 1, platform: value });
+              }}
             >
               <option value="all">All</option>
               {platformOptions.map((p) => (
@@ -196,7 +232,12 @@ export default function Home() {
             Genre:
             <select
               value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setGenreFilter(value);
+                setPage(1);
+                syncSearchParams({ page: 1, genre: value });
+              }}
             >
               <option value="all">All</option>
               {genreOptions.map((g) => (
@@ -223,7 +264,7 @@ export default function Home() {
         <div className="game-grid">
           {filteredGames.map((g) => (
             <div key={g.id} className="game-card">
-                <img src={g.background_image || "/images/no-image.png"} alt={g.name} />
+              <img src={g.background_image || "/images/no-image.png"} alt={g.name}/>
               <div className="game-card-body">
                 <h3>
                   <Link to={`/games/${g.id}`}>
@@ -232,10 +273,10 @@ export default function Home() {
                 </h3>
                 <div className="game-meta">
                   <p>
-                    <strong>Platforms: </strong>{g.platforms .map((p) => p.platform?.name || p.name) .join(", ") || "Unknown Platform"}
+                    <strong>Platforms: </strong> {g.platforms ?.map((p) => p.platform?.name || p.name) .join(", ") || "Unknown Platform"}
                   </p>
                   <p>
-                    <strong>Genre: </strong>{g.genres .map((genre) => genre.name) .join(", ") || "Unknown Genre"}
+                    <strong>Genre: </strong> {g.genres ?.map((genre) => genre.name) .join(", ") || "Unknown Genre"}
                   </p>
                   <p>
                     ⭐ {g.rating ?? "N/A"}
@@ -258,7 +299,7 @@ export default function Home() {
                   <p className="game-hint">
                     <Link to="/login">Login</Link> or{" "}
                     <Link to="/register">Register</Link> to add this game
-                  to your Wishlist, Favorites or Played list.
+                    to your Wishlist, Favorites or Played list.
                   </p>
                 )}
               </div>
