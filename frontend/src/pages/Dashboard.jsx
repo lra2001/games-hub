@@ -1,4 +1,3 @@
-// frontend/src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 import api from "../api/axios.js";
@@ -39,18 +38,6 @@ export default function Dashboard() {
     loadLibrary();
   }, []);
 
-  async function handleRemove(id) {
-    if (!window.confirm("Remove this game from your library?")) return;
-
-    try {
-      await api.delete(`library/${id}/`);
-      setItems((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      console.error("Failed to remove item:", err);
-      alert("Could not remove item.");
-    }
-  }
-
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -80,9 +67,7 @@ export default function Dashboard() {
               path="wishlist"
               element={
                 <LibraryPage
-                  items={items}
                   status="wishlist"
-                  onRemove={handleRemove}
                 />
               }
             />
@@ -90,9 +75,7 @@ export default function Dashboard() {
               path="favorites"
               element={
                 <LibraryPage
-                  items={items}
                   status="favorite"
-                  onRemove={handleRemove}
                 />
               }
             />
@@ -100,9 +83,7 @@ export default function Dashboard() {
               path="played"
               element={
                 <LibraryPage
-                  items={items}
                   status="played"
-                  onRemove={handleRemove}
                 />
               }
             />
