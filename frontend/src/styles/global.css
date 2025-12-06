@@ -189,7 +189,6 @@ a:hover {
 }
 
 .header .auth-links a {
-  margin-left: 1rem;
   color: var(--color-text);
 }
 
@@ -209,19 +208,12 @@ a:hover {
   border-color: var(--border-strong-hover);
 }
 
-/* Wrap avatar/name */
-.header-user {
-  display: flex;
-  align-items: center;
-}
-
 /* Avatar image in header */
 .header-avatar {
   width: 34px;
   height: 34px;
   border-radius: 50%;
   object-fit: cover;
-  margin-left: 0.5rem;
   border: 2px solid var(--color-accent);
   box-shadow: 0 0 6px rgba(0,0,0,0.25);
 }

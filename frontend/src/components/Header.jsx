@@ -49,22 +49,20 @@ export default function Header() {
             <Link to="/dashboard">Dashboard</Link>
 
             {/* Profile Link (avatar OR name) */}
-            <div
-              className="header-user"
-              onClick={() => navigate("/dashboard/profile")}
-            >
+            <div>
+              <Link to="/dashboard/profile">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="avatar" className="header-avatar"/>
               ) : (
-                <span className="header-username">{displayName}</span>
+                <span>{displayName}</span>
               )}
+              </Link>
             </div>
 
             {/* Logout button */}
             <button
               type="button"
               onClick={handleLogout}
-              style={{ marginLeft: "1rem" }}
             >
               Logout
             </button>
