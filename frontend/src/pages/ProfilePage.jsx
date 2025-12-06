@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { AVATARS } from "../constants/avatars.js";
+import useFormErrors from "../hooks/useFormErrors.js";
 
 export default function ProfilePage() {
   const { user, setUser } = useAuth();
@@ -15,6 +16,14 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null); // { type, text }
 
+  const {
+    errors,
+    setFieldError,
+    getFieldError,
+    clearFieldError,
+    clearAllErrors,
+  } = useFormErrors();
+
   useEffect(() => {
     if (user) {
       setForm({
@@ -24,29 +33,62 @@ export default function ProfilePage() {
         last_name: user.last_name || "",
         avatar: user.avatar || "",
       });
+      clearAllErrors();
     }
   }, [user]);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    clearFieldError(name);
+    setMessage(null);
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
+    clearAllErrors();
+
+    let hasError = false;
+
+    if (!form.username.trim()) {
+    setFieldError("username", "Username is required.");
+    hasError = true;
+    }
+    if (!form.email.trim()) {
+      setFieldError("email", "Email is required.");
+      hasError = true;
+    } else if (!form.email.includes("@")) {
+      setFieldError("email", "Enter a valid email.");
+      hasError = true;
+    }
+
+    if (hasError) {
+      setSaving(false);
+      return;
+    }
 
     try {
-      const res = await api.put("users/me/", form);
-      setUser(res.data); // update user in context
-      setMessage({ type: "success", text: "Profile updated successfully." });
+    const res = await api.put("users/me/", form);
+    setUser(res.data);
+    setMessage({
+      type: "success",
+      text: "Profile updated successfully.",
+      });
     } catch (err) {
       console.error(err);
+      const data = err.response?.data;
+
+      if (data?.email?.[0]) {
+        setFieldError("email", data.email[0]);
+      }
+      if (data?.username?.[0]) {
+        setFieldError("username", data.username[0]);
+      }
+
       const detail =
-        err.response?.data?.email?.[0] ||
-        err.response?.data?.detail ||
-        "Failed to update profile.";
+        data?.detail || data?.non_field_errors?.[0] || "Failed to update profile.";
       setMessage({ type: "error", text: detail });
     } finally {
       setSaving(false);
@@ -65,15 +107,17 @@ export default function ProfilePage() {
         <p className={`alert ${message.type}`}>{message.text}</p>
       )}
 
-      <form className="profile-form" onSubmit={handleSubmit}>
+      <form className="profile-form" onSubmit={handleSubmit} noValidate>
         <label>
           Username
           <input
             name="username"
             value={form.username}
             onChange={handleChange}
-            required
           />
+          {getFieldError("username") && (
+            <p className="field-error">{getFieldError("username")}</p>
+          )}
         </label>
 
         <label>
@@ -83,8 +127,10 @@ export default function ProfilePage() {
             name="email"
             value={form.email}
             onChange={handleChange}
-            required
           />
+          {getFieldError("email") && (
+            <p className="field-error">{getFieldError("email")}</p>
+          )}
         </label>
 
         <label>

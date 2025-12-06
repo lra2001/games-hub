@@ -1,15 +1,32 @@
 import { useState } from "react";
 import api from "../api/axios.js";
+import useFormErrors from "../hooks/useFormErrors.js";
 
 export default function PasswordResetRequest() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null); // { type, text }
   const [loading, setLoading] = useState(false);
+  const { errors, validate, clearAllErrors } = useFormErrors();
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setMessage(null);
-    setLoading(true);
+    clearAllErrors();
+
+    const isValid = validate(
+    {
+      email,
+    },
+    {
+      email: (value) =>
+        !value.trim()
+          ? "Email is required."
+          : !value.includes("@")
+          ? "Enter a valid email."
+          : "",
+    }
+  );
+
+  if (!isValid) return;
 
     try {
       await api.post("users/password-reset/", { email });
@@ -44,15 +61,23 @@ export default function PasswordResetRequest() {
           </p>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        {errors.email && (
+          <p className="alert error">{errors.email}</p>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate>
+          <div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
+              className={errors.email ? "input-error" : ""}
+            />
+          </div>
 
           <button type="submit" disabled={loading}>
             {loading ? "Sending…" : "Send reset link"}

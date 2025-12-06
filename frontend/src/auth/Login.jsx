@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../api/axios.js";
 import { useAuth } from "./AuthContext.jsx";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import useFormErrors from "../hooks/useFormErrors.js";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -9,20 +10,44 @@ export default function Login() {
   const { login } = useAuth();
 
   const [form, setForm] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
+  const [globalError, setGlobalError] = useState("");
+
+  const { errors, clearAllErrors, validate } = useFormErrors();
 
   const from = location.state?.from;
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
+    setGlobalError("");
+    clearAllErrors();
+
+    const isValid = validate(
+      {
+        username: form.username,
+        password: form.password,
+      },
+      {
+        username: (value) =>
+          !value.trim() ? "Username is required." : "",
+        password: (value) =>
+          !value ? "Password is required." : "",
+      }
+    );
+
+    if (!isValid) return;
 
     try {
       const res = await api.post("users/token/", form);
       login(res.data.access, res.data.refresh);
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid credentials");
+      const backendMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0];
+
+      setGlobalError(
+        backendMsg || "Invalid username or password."
+      );
     }
   }
 
@@ -37,29 +62,47 @@ export default function Login() {
           </p>
         )}
 
-        {error && <p className="alert error">{error}</p>}
+        {globalError && (
+          <p className="alert error">{globalError}</p>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={form.username}
-            onChange={(e) =>
-              setForm({ ...form, username: e.target.value })
-            }
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
-            required
-          />
+        <form onSubmit={handleSubmit} noValidate>
+          <div>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={form.username}
+              onChange={(e) =>
+                setForm({ ...form, username: e.target.value })
+              }
+              className={errors.username ? "input-error" : ""}
+            />
+            {errors.username && (
+              <div className="field-error">
+                {errors.username}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
+              className={errors.password ? "input-error" : ""}
+            />
+            {errors.password && (
+              <div className="field-error">
+                {errors.password}
+              </div>
+            )}
+          </div>
+
           <button type="submit">Login</button>
         </form>
 
