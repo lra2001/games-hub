@@ -27,12 +27,15 @@ export default function Home() {
   const [platformFilter, setPlatformFilter] = useState(platformParam);
   const [genreFilter, setGenreFilter] = useState(genreParam);
 
+  // track which games are in user's library and their statuses
+  const [gameStatuses, setGameStatuses] = useState({});
+
   // keep page in sync with URL change
   useEffect(() => {
     setPage(pageParam);
   }, [pageParam]);
 
-  // helper: sync state -> URL
+  // keep filters in sync with URL change
   function syncSearchParams(overrides = {}) {
     const params = {};
 
@@ -51,6 +54,7 @@ export default function Home() {
     setSearchParams(params);
   }
 
+  // Fetch games for Home (no search query)
   useEffect(() => {
     async function fetchGames() {
       setLoading(true);
@@ -80,7 +84,40 @@ export default function Home() {
     syncSearchParams({ page: safePage });
   }
 
-  // Build platform + genre filter options
+  // Load user's library to track game statuses
+  useEffect(() => {
+    async function loadLibraryStatuses() {
+      if (!user) {
+        setGameStatuses({});
+        return;
+      }
+
+      try {
+        const res = await api.get("library/");
+        const statusMap = {};
+        res.data.forEach((item) => {
+          if (!statusMap[item.game_id]) {
+            statusMap[item.game_id] = {
+              wishlist: false,
+              favorite: false,
+              played: false,
+            };
+          }
+          const key = item.status?.toLowerCase();
+          if (key && statusMap[item.game_id].hasOwnProperty(key)) {
+            statusMap[item.game_id][key] = true;
+          }
+        });
+        setGameStatuses(statusMap);
+      } catch (err) {
+        console.error("Failed to load library for Home:", err);
+      }
+    }
+
+    loadLibraryStatuses();
+  }, [user]);
+
+  // Build filter options for platforms and genres
   const platformOptions = (() => {
     const map = new Map();
     games.forEach((g) => {
@@ -164,6 +201,23 @@ export default function Home() {
         game_id: game.id,
         status,
       });
+
+      // mark game/status as existing so buttons update immediately
+      setGameStatuses((prev) => {
+        const existing = prev[game.id] || {
+          wishlist: false,
+          favorite: false,
+          played: false,
+        };
+        return {
+          ...prev,
+          [game.id]: {
+            ...existing,
+            [status]: true,
+          },
+        };
+      });
+
       setFeedback({
         type: "success",
         text: `${game.name} added to your ${status} list.`,
@@ -262,49 +316,75 @@ export default function Home() {
 
       <div className="search-results-card">
         <div className="game-grid">
-          {filteredGames.map((g) => (
-            <div key={g.id} className="game-card">
-              <img src={g.background_image || "/images/no-image.png"} alt={g.name}/>
-              <div className="game-card-body">
-                <h3>
-                  <Link to={`/games/${g.id}`}>
-                    {g.name}
-                  </Link>
-                </h3>
-                <div className="game-meta">
-                  <p>
-                    <strong>Platforms: </strong> {g.platforms ?.map((p) => p.platform?.name || p.name) .join(", ") || "Unknown Platform"}
-                  </p>
-                  <p>
-                    <strong>Genre: </strong> {g.genres ?.map((genre) => genre.name) .join(", ") || "Unknown Genre"}
-                  </p>
-                  <p>
-                    ⭐ {g.rating ?? "N/A"}
-                  </p>
-                </div>
+          {filteredGames.map((g) => {
+            const statuses = gameStatuses[g.id] || {
+              wishlist: false,
+              favorite: false,
+              played: false,
+            };
 
-                {user ? (
-                  <div className="game-actions">
-                    <button onClick={() => addToLibrary(g, "wishlist")}>
-                      Wishlist
-                    </button>
-                    <button onClick={() => addToLibrary(g, "favorite")}>
-                      Favorite
-                    </button>
-                    <button onClick={() => addToLibrary(g, "played")}>
-                      Played
-                    </button>
+            return (
+              <div key={g.id} className="game-card">
+                <img
+                  src={g.background_image || "/images/no-image.png"}
+                  alt={g.name}
+                />
+                <div className="game-card-body">
+                  <h3>
+                    <Link to={`/games/${g.id}`}>
+                      {g.name}
+                    </Link>
+                  </h3>
+                  <div className="game-meta">
+                    <p>
+                      <strong>Platforms: </strong>
+                      {(g.platforms || [])
+                        .map((p) => p.platform?.name || p.name)
+                        .join(", ") || "Unknown Platform"}
+                    </p>
+                    <p>
+                      <strong>Genre: </strong>
+                      {(g.genres || [])
+                        .map((genre) => genre.name)
+                        .join(", ") || "Unknown Genre"}
+                    </p>
+                    <p>
+                      ⭐ {g.rating ?? "N/A"}
+                    </p>
                   </div>
-                ) : (
-                  <p className="game-hint">
-                    <Link to="/login">Login</Link> or{" "}
-                    <Link to="/register">Register</Link> to add this game
-                    to your Wishlist, Favorites or Played list.
-                  </p>
-                )}
+
+                  {user ? (
+                    <div className="game-actions">
+                      <button
+                        onClick={() => addToLibrary(g, "wishlist")}
+                        disabled={statuses.wishlist}
+                      >
+                        {statuses.wishlist ? "In Wishlist" : "Wishlist"}
+                      </button>
+                      <button
+                        onClick={() => addToLibrary(g, "favorite")}
+                        disabled={statuses.favorite}
+                      >
+                        {statuses.favorite ? "In Favorites" : "Favorite"}
+                      </button>
+                      <button
+                        onClick={() => addToLibrary(g, "played")}
+                        disabled={statuses.played}
+                      >
+                        {statuses.played ? "In Played" : "Played"}
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="game-hint">
+                      <Link to="/login">Login</Link> or{" "}
+                      <Link to="/register">Register</Link> to add this game
+                      to your Wishlist, Favorites or Played list.
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
