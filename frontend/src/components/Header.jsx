@@ -41,7 +41,7 @@ export default function Header() {
         <button type="submit">Search</button>
       </form>
 
-      {/* Right side – auth controls */}
+      {/* Right side - auth controls */}
       <div className="auth-links">
         {user ? (
           <>

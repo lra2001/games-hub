@@ -64,10 +64,11 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -162,3 +163,14 @@ SIMPLE_JWT = {
 
 RAWG_API_KEY = os.getenv("RAWG_API_KEY")
 RAWG_BASE_URL = os.getenv("RAWG_BASE_URL", "https://api.rawg.io/api")
+
+# Email settings for password reset
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "GamesHub <no-reply@gameshub.com>")
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Use this line for development
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # Use this line for production
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')

@@ -302,6 +302,36 @@ a:hover {
   color: var(--text-muted);
 }
 
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 3rem; /* space for toggle button */
+  box-sizing: border-box;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 28%;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 0;
+  margin: 0;
+  height: auto;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--color-accent-light);
+}
+
 /* =========================================================
    Dashboard Layout
    ========================================================= */
