@@ -64,3 +64,57 @@ class GameDetailView(APIView):
 
         data = rawg_response.json()
         return Response(data, status=status.HTTP_200_OK)
+
+class GameMediaView(APIView):
+# Return screenshots, trailers and youtube videos for a game - GET /api/games/<game_id>/media/
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, game_id):
+        base_url = settings.RAWG_BASE_URL
+        params = {"key": settings.RAWG_API_KEY}
+
+        screenshots = []
+        trailers = []
+        youtube_videos = []
+
+        # Screenshots
+        try:
+            s_resp = requests.get(
+                f"{base_url}/games/{game_id}/screenshots",
+                params=params
+            )
+            s_resp.raise_for_status()
+            screenshots = s_resp.json().get("results", [])
+        except requests.exceptions.RequestException:
+            screenshots = []
+
+        # Trailers / movies
+        try:
+            t_resp = requests.get(
+                f"{base_url}/games/{game_id}/movies",
+                params=params
+            )
+            t_resp.raise_for_status()
+            trailers = t_resp.json().get("results", [])
+        except requests.exceptions.RequestException:
+            trailers = []
+
+        # YouTube videos
+        try:
+            y_resp = requests.get(
+                f"{base_url}/games/{game_id}/youtube",
+                params=params
+            )
+            y_resp.raise_for_status()
+            youtube_videos = y_resp.json().get("results", [])
+        except requests.exceptions.RequestException:
+            youtube_videos = []
+
+        return Response(
+            {
+                "screenshots": screenshots,
+                "trailers": trailers,
+                "youtube": youtube_videos,
+            },
+            status=status.HTTP_200_OK,
+        )

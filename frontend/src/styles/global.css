@@ -732,6 +732,19 @@ button.danger:hover:not(:disabled) {
   cursor: default;
 }
 
+.back-button {
+  background: none;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
 /* Login hint when not authenticated */
 .game-detail-login-hint {
   font-size: 0.9rem;
@@ -751,6 +764,172 @@ button.danger:hover:not(:disabled) {
 .game-detail-description p {
   font-size: 0.95rem;
   color: var(--text-subtle);
+}
+
+.game-detail-media {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.media-block h3 {
+  margin-bottom: 0.75rem;
+}
+
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.screenshot-grid img {
+  width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Trailers */
+.trailer-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.trailer-item p {
+  margin-bottom: 0.3rem;
+}
+
+.trailer-video {
+  width: 100%;
+  border-radius: 8px;
+  max-height: 260px;
+  object-fit: cover;
+}
+
+/* YouTube */
+.youtube-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.youtube-item p {
+  margin-bottom: 0.3rem;
+}
+
+.youtube-frame-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+}
+
+.youtube-frame-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.game-detail-tabs {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.game-detail-tabs .tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--color-white-dim);
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-radius: 8px 8px 0 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.game-detail-tabs .tab:hover {
+  background: var(--color-hover-light);
+}
+
+.game-detail-tabs .tab.active {
+  background: var(--color-surface-light);
+  color: var(--color-white);
+  font-weight: 500;
+}
+
+/* Tab content wrapper */
+.game-detail-tab-content {
+  margin-top: 1rem;
+}
+
+/* Media layout reused for screenshots + videos */
+.game-detail-media {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.media-block h3 {
+  margin-bottom: 0.75rem;
+}
+
+/* Screenshots grid */
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.screenshot-grid img {
+  width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Trailers */
+.trailer-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.trailer-item p {
+  margin-bottom: 0.3rem;
+}
+
+.trailer-video {
+  width: 100%;
+  border-radius: 8px;
+  max-height: 260px;
+  object-fit: cover;
+}
+
+/* YouTube videos */
+.youtube-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.youtube-item p {
+  margin-bottom: 0.3rem;
+}
+
+.youtube-frame-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+}
+
+.youtube-frame-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
 }
 
 /* =========================================================
@@ -875,5 +1054,14 @@ button.danger:hover:not(:disabled) {
 
   .game-detail-main {
     width: 100%;
+  }
+
+  .game-detail-tabs {
+    flex-wrap: wrap;
+  }
+
+  .game-detail-tabs .tab {
+    flex: 1 0 auto;
+    text-align: center;
   }
 }
