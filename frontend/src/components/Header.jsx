@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
+import { AVATAR_MAP } from "../constants/avatars";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -17,6 +18,15 @@ export default function Header() {
       navigate(`/search?query=${encodeURIComponent(query)}`);
     }
   }
+
+  const displayName =
+    user?.first_name?.trim() ||
+    user?.username ||
+    "Profile";
+
+  const avatarUrl = user?.avatar
+    ? AVATAR_MAP[user.avatar]?.src || null
+    : null;
 
   return (
     <header className="header">
@@ -38,10 +48,17 @@ export default function Header() {
             {/* Dashboard shortcut */}
             <Link to="/dashboard">Dashboard</Link>
 
-            {/* Greeting */}
-            <span style={{ marginLeft: "1rem" }}>
-              Hello {user.first_name || user.username}
-            </span>
+            {/* Profile Link (avatar OR name) */}
+            <div
+              className="header-user"
+              onClick={() => navigate("/dashboard/profile")}
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="avatar" className="header-avatar"/>
+              ) : (
+                <span className="header-username">{displayName}</span>
+              )}
+            </div>
 
             {/* Logout button */}
             <button

@@ -1,5 +1,5 @@
 from rest_framework import generics, permissions
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 
 # Create your views here.
@@ -11,9 +11,9 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
-class ProfileView(generics.RetrieveAPIView):
-    serializer_class = UserSerializer
+class MeView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProfileSerializer
 
     def get_object(self):
         return self.request.user

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 import api from "../api/axios.js";
 import LibraryPage from "./LibraryPage.jsx";
+import ProfilePage from "./ProfilePage.jsx";
 
 export default function Dashboard() {
   const [items, setItems] = useState([]);
@@ -63,6 +64,9 @@ export default function Dashboard() {
           <NavLink to="/dashboard/played">
             Played ({counts.played})
           </NavLink>
+          <NavLink to="/dashboard/profile">
+            Profile
+          </NavLink>
         </nav>
       </aside>
 
@@ -101,6 +105,10 @@ export default function Dashboard() {
                   onRemove={handleRemove}
                 />
               }
+            />
+            <Route
+              path="profile"
+              element={<ProfilePage />}
             />
             <Route
               index

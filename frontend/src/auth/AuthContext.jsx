@@ -28,7 +28,6 @@ export function AuthProvider({ children }) {
   function login(accessToken, refreshToken) {
     localStorage.setItem("access", accessToken);
     localStorage.setItem("refresh", refreshToken);
-
     setAccess(accessToken);
   }
 
@@ -40,7 +39,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, access, login, logout }}>
+    <AuthContext.Provider value={{ user, access, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

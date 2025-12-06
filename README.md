@@ -244,6 +244,12 @@ The goal is to make the app installable and available offline using:
 - [@popperjs/core](https://www.npmjs.com/package/@popperjs/core)
 - [bootstrap](https://www.npmjs.com/package/bootstrap?activeTab=versions)
 
+
+### Images
+- [Freepik - Avatars](https://www.freepik.com/)
+- [Image Convert - Convert images from jpg to png](https://www.imageconvert.org/)
+- [Image Resizer - Resize Images](https://imageresizer.com/)
+
 ## Known Issues
 
 - TBC
