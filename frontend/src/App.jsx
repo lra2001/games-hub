@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import GameSearch from "./pages/GameSearch.jsx";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 import GameDetail from "./pages/GameDetail.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
   return (
@@ -33,6 +34,9 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* 404 - Handle Page not Found */}
+        <Route path="*" element={<NotFound />} />
 
         {/* Search page */}
         <Route path="/search" element={<GameSearch />} />
