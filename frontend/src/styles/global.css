@@ -142,6 +142,20 @@ a:hover {
   z-index: 1000;
 }
 
+.header-top {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto; /* pushes auth area to the far right */
+}
+
 /* Logo */
 .header .logo a {
   font-size: 1.4rem;
@@ -180,6 +194,29 @@ a:hover {
   background: var(--color-accent-hover);
 }
 
+/* Hamburger (hidden by default – desktop only) */
+.header-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.header-menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--color-text);
+  margin: 2px 0;
+}
+
 /* Auth links */
 
 .auth-links {
@@ -216,6 +253,15 @@ a:hover {
   object-fit: cover;
   border: 2px solid var(--color-accent);
   box-shadow: 0 0 6px rgba(0,0,0,0.25);
+}
+
+.header-avatar-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 
 /* Logout button */
@@ -1063,72 +1109,100 @@ button.danger:hover:not(:disabled) {
   }
 }
 
-  @media (max-width: 768px) {
-.header {
-  flex-wrap: wrap;
-  align-items: flex-start;
-  row-gap: 0.5rem;
-  height: auto;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 0.5rem;
+    height: auto;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
 
-.header .logo {
-  flex: 1 0 100%;
-  margin-bottom: 0.25rem;
-}
+  .header-top {
+    width: 100%;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
 
-.header .search-form {
-  order: 3;
-  flex: 1 0 100%;
-  margin: 0.25rem 0 0;
-}
+  .header .logo {
+    flex: 0 0 auto;
+  }
 
-.header .auth-links {
-  order: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-}
+  .header .search-form {
+    order: 3;
+    flex: 1 0 100%;
+    margin: 0.25rem 0 0;
+    max-width: 100%;
+  }
 
-.header-avatar {
-  width: 28px;
-  height: 28px;
-}
-}
+  .header-right {
+    margin-left: auto;
+  }
+
+  /* Show hamburger on mobile */
+  .header-menu-toggle {
+    display: inline-flex;
+  }
+
+  /* Auth links become a dropdown, hidden by default */
+  .header .auth-links {
+    order: 2;
+    position: absolute;
+    top: calc(var(--header-height) - 4px);
+    right: 0.75rem;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    background: var(--color-surface);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    z-index: 1100;
+  }
+
+  .header .auth-links.open {
+    display: flex;
+  }
+
+  .header-avatar {
+    width: 28px;
+    height: 28px;
+  }
 
   .dashboard-container {
-  flex-direction: column;
-}
+    flex-direction: column;
+  }
 
-.sidebar {
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-around;
-}
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
 
-.dashboard-main {
-  padding: 1rem;
-}
-.game-detail-card {
-  padding: 1.25rem 1.25rem 1.5rem;
-}
+  .dashboard-main {
+    padding: 1rem;
+  }
+  .game-detail-card {
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
 
-.game-detail-header {
-  flex-direction: column;
-  align-items: center;
-}
+  .game-detail-header {
+    flex-direction: column;
+    align-items: center;
+  }
 
-.game-detail-main {
-  width: 100%;
-}
+  .game-detail-main {
+    width: 100%;
+  }
 
-.game-detail-tabs {
-  flex-wrap: wrap;
-}
+  .game-detail-tabs {
+    flex-wrap: wrap;
+  }
 
-.game-detail-tabs .tab {
-  flex: 1 0 auto;
-  text-align: center;
+  .game-detail-tabs .tab {
+    flex: 1 0 auto;
+    text-align: center;
+  }
 }
