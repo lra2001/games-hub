@@ -560,8 +560,9 @@ button.danger:hover:not(:disabled) {
 /* Game cards grid */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
+  justify-items: stretch;
 }
 
 .search-results-card {
@@ -574,6 +575,7 @@ button.danger:hover:not(:disabled) {
 }
 
 .game-card {
+  height: 100%;
   background: var(--color-surface);
   border-radius: 10px;
   overflow: hidden;
@@ -1061,39 +1063,72 @@ button.danger:hover:not(:disabled) {
   }
 }
 
-   @media (max-width: 768px) {
+  @media (max-width: 768px) {
+.header {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  row-gap: 0.5rem;
+  height: auto;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.header .logo {
+  flex: 1 0 100%;
+  margin-bottom: 0.25rem;
+}
+
+.header .search-form {
+  order: 3;
+  flex: 1 0 100%;
+  margin: 0.25rem 0 0;
+}
+
+.header .auth-links {
+  order: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.header-avatar {
+  width: 28px;
+  height: 28px;
+}
+}
+
   .dashboard-container {
-    flex-direction: column;
-  }
+  flex-direction: column;
+}
 
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-around;
-  }
+.sidebar {
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-around;
+}
 
-  .dashboard-main {
-    padding: 1rem;
-  }
-  .game-detail-card {
-    padding: 1.25rem 1.25rem 1.5rem;
-  }
+.dashboard-main {
+  padding: 1rem;
+}
+.game-detail-card {
+  padding: 1.25rem 1.25rem 1.5rem;
+}
 
-  .game-detail-header {
-    flex-direction: column;
-    align-items: center;
-  }
+.game-detail-header {
+  flex-direction: column;
+  align-items: center;
+}
 
-  .game-detail-main {
-    width: 100%;
-  }
+.game-detail-main {
+  width: 100%;
+}
 
-  .game-detail-tabs {
-    flex-wrap: wrap;
-  }
+.game-detail-tabs {
+  flex-wrap: wrap;
+}
 
-  .game-detail-tabs .tab {
-    flex: 1 0 auto;
-    text-align: center;
-  }
+.game-detail-tabs .tab {
+  flex: 1 0 auto;
+  text-align: center;
 }
