@@ -236,7 +236,7 @@ export default function GameDetail() {
                       ? "In Played"
                       : addingStatus === "played"
                       ? "Adding…"
-                      : "In Played"}
+                      : "Played"}
                   </button>
                 </>
               ) : (
