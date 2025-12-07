@@ -39,7 +39,7 @@ export default function Login() {
     try {
       const res = await api.post("users/token/", form);
       login(res.data.access, res.data.refresh);
-      navigate("/dashboard");
+      navigate("/dashboard/wishlist");
     } catch (err) {
       const backendMsg =
         err.response?.data?.detail ||

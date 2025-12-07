@@ -89,7 +89,7 @@ export default function Header() {
           <nav className={`auth-links ${menuOpen ? "open" : ""}`}>
             {user ? (
               <>
-                <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
+                <Link to="/dashboard/wishlist" onClick={() => setMenuOpen(false)}>
                   Dashboard
                 </Link>
 
