@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
+import useLibraryActions from "../hooks/useLibraryActions.js";
 
 export default function GameDetail() {
   // Get game ID from URL params
@@ -11,6 +12,8 @@ export default function GameDetail() {
   const prevQuery = searchParams.get("query");
   const prevPage = searchParams.get("page");
   const navigate = useNavigate();
+
+  const {addToLibrary: addToLibraryApi, feedback, setFeedback, } = useLibraryActions();
 
   // Game detail states
   const [game, setGame] = useState(null);
@@ -36,6 +39,10 @@ export default function GameDetail() {
     favorite: false,
     played: false,
   });
+
+    useEffect(() => {
+    setFeedback(null);
+  }, [id, setFeedback]);
 
   const [message, setMessage] = useState(null); // { type, text }
 
@@ -106,40 +113,19 @@ export default function GameDetail() {
   }, [user, game]);
 
   async function addToLibrary(status = "wishlist") {
-    if (!user) {
-      setMessage({
-        type: "error",
-        text: "Please login or register to add games to your library.",
-      });
-      return;
-    }
+    if (!game) return;
+    setAddingStatus(status);
+    setFeedback(null);
 
-    try {
-      setAddingStatus(status);
-      setMessage(null);
-      await api.post("library/add-from-rawg/", {
-        game_id: game.id,
-        status,
-      });
+    const ok = await addToLibraryApi(game, status);
+    setAddingStatus(null);
 
-      setLibraryStatuses((prev) => ({
-        ...prev,
-        [status]: true,
-      }));
+    if (!ok) return;
 
-      setMessage({
-        type: "success",
-        text: `Added to your ${status} list.`,
-      });
-    } catch (err) {
-      console.error(err);
-      setMessage({
-        type: "error",
-        text: err.response?.data?.error || "Failed to add to library.",
-      });
-    } finally {
-      setAddingStatus(null);
-    }
+    setLibraryStatuses((prev) => ({
+      ...prev,
+      [status]: true,
+    }));
   }
 
   if (loading) return <p>Loading game…</p>;

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { filterByGenre, filterByPlatform, filterByRating, buildPlatformOptions, buildGenreOptions } from "../utils/gameFilters.js";
+import useLibraryActions from "../hooks/useLibraryActions.js";
 
 const PAGE_SIZE = 10;
 
@@ -19,7 +20,8 @@ export default function Home() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+
+  const { addToLibrary, feedback, setFeedback } = useLibraryActions();
 
   const [page, setPage] = useState(pageParam);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,7 +79,7 @@ export default function Home() {
     }
 
     fetchGames();
-  }, [page]);
+  }, [page, setFeedback]);
 
   function updatePage(newPage) {
     const safePage = Math.min(Math.max(newPage, 1), totalPages || 1);
@@ -120,7 +122,6 @@ export default function Home() {
 
   // Build filter options for platforms and genres
   const platformOptions = buildPlatformOptions(games);
-
   const genreOptions = buildGenreOptions(games);
 
   const filteredGames = games.filter(
@@ -129,50 +130,25 @@ export default function Home() {
     filterByPlatform(platformFilter, g) &&
     filterByGenre(genreFilter, g)
 );
-  async function addToLibrary(game, status = "wishlist") {
-    if (!user) {
-      setFeedback({
-        type: "error",
-        text: "Please login or register to add games to your library.",
-      });
-      return;
-    }
+  async function handleAddToLibrary(game, status = "wishlist") {
+    const ok = await addToLibraryApi(game, status);
+    if (!ok) return;
 
-    try {
-      await api.post("library/add-from-rawg/", {
-        game_id: game.id,
-        status,
-      });
-
-      // mark game/status as existing so buttons update immediately
-      setGameStatuses((prev) => {
-        const existing = prev[game.id] || {
-          wishlist: false,
-          favorite: false,
-          played: false,
-        };
-        return {
-          ...prev,
-          [game.id]: {
-            ...existing,
-            [status]: true,
-          },
-        };
-      });
-
-      setFeedback({
-        type: "success",
-        text: `${game.name} added to your ${status} list.`,
-      });
-    } catch (err) {
-      console.error(err);
-      setFeedback({
-        type: "error",
-        text:
-          err.response?.data?.error ||
-          "Failed to add game to your library.",
-      });
-    }
+    // mark game/status as existing so buttons update immediately
+    setGameStatuses((prev) => {
+      const existing = prev[game.id] || {
+        wishlist: false,
+        favorite: false,
+        played: false,
+      };
+      return {
+        ...prev,
+        [game.id]: {
+          ...existing,
+          [status]: true,
+        },
+      };
+    });
   }
 
   return (
@@ -298,19 +274,19 @@ export default function Home() {
                   {user ? (
                     <div className="game-actions">
                       <button
-                        onClick={() => addToLibrary(g, "wishlist")}
+                        onClick={() => handleAddToLibrary(g, "wishlist")}
                         disabled={statuses.wishlist}
                       >
                         {statuses.wishlist ? "In Wishlist" : "Wishlist"}
                       </button>
                       <button
-                        onClick={() => addToLibrary(g, "favorite")}
+                        onClick={() => handleAddToLibrary(g, "favorite")}
                         disabled={statuses.favorite}
                       >
                         {statuses.favorite ? "In Favorites" : "Favorite"}
                       </button>
                       <button
-                        onClick={() => addToLibrary(g, "played")}
+                        onClick={() => handleAddToLibrary(g, "played")}
                         disabled={statuses.played}
                       >
                         {statuses.played ? "In Played" : "Played"}

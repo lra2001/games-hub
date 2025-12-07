@@ -3,16 +3,19 @@ import { useSearchParams, Link } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { filterByRating, filterByPlatform, filterByGenre, buildGenreOptions, buildPlatformOptions } from "../utils/gameFilters.js";
+import useLibraryActions from "../hooks/useLibraryActions.js";
 
 const PAGE_SIZE = 10;
 
 export default function GameSearch() {
   const { user } = useAuth();
 
+  const { addToLibrary: addToLibraryApi, feedback, setFeedback } =
+    useLibraryActions();
+
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [feedback, setFeedback] = useState(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
@@ -139,47 +142,23 @@ export default function GameSearch() {
       filterByGenre(genreFilter, g)
   );
 
-  async function addToLibrary(game, status = "wishlist") {
-    if (!user) {
-      setFeedback({
-        type: "error",
-        text: "Please login or register to add games to your library.",
-      });
-      return;
-    }
+  async function handleAddToLibrary(game, status = "wishlist") {
+    // Use the shared hook to do API + messages
+    const ok = await addToLibraryApi(game, status);
+    if (!ok) return; // hook already set feedback
 
-    try {
-      await api.post("library/add-from-rawg/", {
-        game_id: game.id,
-        status,
-      });
-
-      // Update local statuses so buttons are disabled immediately
-      setLibraryStatuses((prev) => ({
-        ...prev,
-        [game.id]: {
-          ...(prev[game.id] || {
-            wishlist: false,
-            favorite: false,
-            played: false,
-          }),
-          [status]: true,
-        },
-      }));
-
-      setFeedback({
-        type: "success",
-        text: `${game.name} added to your ${status} list.`,
-      });
-    } catch (err) {
-      console.error(err);
-      setFeedback({
-        type: "error",
-        text:
-          err.response?.data?.error ||
-          "Failed to add game to your library.",
-      });
-    }
+    // If success, mark the status locally so buttons update immediately
+    setLibraryStatuses((prev) => ({
+      ...prev,
+      [game.id]: {
+        ...(prev[game.id] || {
+          wishlist: false,
+          favorite: false,
+          played: false,
+        }),
+        [status]: true,
+      },
+    }));
   }
 
   return (
@@ -305,19 +284,19 @@ export default function GameSearch() {
                 {user ? (
                   <div className="game-actions">
                     <button
-                      onClick={() => addToLibrary(g, "wishlist")}
+                      onClick={() => handleAddToLibrary(g, "wishlist")}
                       disabled={stat.wishlist}
                     >
                       {stat.wishlist ? "In Wishlist" : "Wishlist"}
                     </button>
                     <button
-                      onClick={() => addToLibrary(g, "favorite")}
+                      onClick={() => handleAddToLibrary(g, "favorite")}
                       disabled={stat.favorite}
                     >
                       {stat.favorite ? "In Favorites" : "Favorite"}
                     </button>
                     <button
-                      onClick={() => addToLibrary(g, "played")}
+                      onClick={() => handleAddToLibrary(g, "played")}
                       disabled={stat.played}
                     >
                       {stat.played ? "In Played" : "Played"}
