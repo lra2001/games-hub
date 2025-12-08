@@ -208,7 +208,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://games-hub.onrender.com",
+    "https://games-hub-awb2.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
