@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === "build" ? "/static/" : "/",
   plugins: [
     react(),
     VitePWA({
@@ -58,5 +59,10 @@ export default defineConfig({
         ]
       }
     })
-  ]
-})
+  ],
+
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
+  },
+}));

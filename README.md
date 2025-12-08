@@ -163,6 +163,7 @@ The goal is to make the app installable and available offline using:
 ### Official Documentation
 - [Django REST Framework](https://www.django-rest-framework.org/)
 - [Django re-path()](https://docs.djangoproject.com/en/5.2/ref/urls/#re-path)
+- [Django - Writing and running tests](https://docs.djangoproject.com/en/5.2/topics/testing/overview/)
 - [Class-based views](https://docs.djangoproject.com/en/5.2/topics/class-based-views/#usage-in-your-urlconf)
 - [PostgreSQL](https://www.postgresql.org/)
 - [Psycopg](https://www.psycopg.org/docs/install.html)
