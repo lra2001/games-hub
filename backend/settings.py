@@ -50,13 +50,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -136,11 +136,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
 from datetime import timedelta
 
 # REST Framework and JWT settings
@@ -159,16 +154,42 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-#  Settings for RAWG API
+# Security settings
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+# Settings for RAWG API
 
 RAWG_API_KEY = os.getenv("RAWG_API_KEY")
 RAWG_BASE_URL = os.getenv("RAWG_BASE_URL", "https://api.rawg.io/api")
 
-# Email settings for password reset
+# Settings for frontend integration
+
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# CORS and CSRF settings
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://games-hub.onrender.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    FRONTEND_URL.replace("http://", "https://").replace("https://", "https://"),
+]
+
+# Email settings
+
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "GamesHub <no-reply@gameshub.com>")
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Use this line for development
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # Use this line for production
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
