@@ -1,8 +1,10 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/",
-});
+const rawBase = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+
+const baseURL = rawBase.replace(/\/+$/, "") + "/api/";
+
+const api = axios.create({ baseURL });
 
 // ------------------------
 // ADD AUTH HEADER
