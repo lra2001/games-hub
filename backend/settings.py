@@ -214,7 +214,8 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    FRONTEND_URL.replace("http://", "https://").replace("https://", "https://"),
+    "http://localhost:5173",
+    "https://games-hub-awb2.onrender.com",
 ]
 
 # Email settings
