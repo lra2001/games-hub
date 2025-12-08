@@ -25,3 +25,19 @@ class GameSearchTests(APITestCase):
         self.assertIn("results", response.data)
         self.assertEqual(len(response.data["results"]), 2)
         self.assertEqual(response.data["results"][0]["name"], "Test Game 1")
+
+class GameMediaTests(APITestCase):
+    @patch("games.views.requests.get")
+    def test_media_endpoint_ok(self, mock_get):
+        # Fake RAWG response
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            "results": [],
+        }
+
+        url = reverse("game_media", kwargs={"game_id": 1})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn("screenshots", resp.data)
+        self.assertIn("trailers", resp.data)
+        self.assertIn("youtube", resp.data)
